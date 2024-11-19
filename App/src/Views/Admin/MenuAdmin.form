@@ -15,9 +15,6 @@
       <SubComponents>
         <Menu class="javax.swing.JMenu" name="topMenu">
           <Properties>
-            <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-              <Image iconType="3" name="/Icons/top.png"/>
-            </Property>
             <Property name="text" type="java.lang.String" value="Inicio"/>
           </Properties>
           <SubComponents>
@@ -29,42 +26,36 @@
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="topMenuItemActionPerformed"/>
               </Events>
             </MenuItem>
-          </SubComponents>
-        </Menu>
-        <Menu class="javax.swing.JMenu" name="userMenu">
-          <Properties>
-            <Property name="background" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
-              <Color blue="77" green="64" red="b" type="rgb"/>
-            </Property>
-            <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-              <Image iconType="3" name="/Icons/users.png"/>
-            </Property>
-            <Property name="text" type="java.lang.String" value="Usuarios"/>
-          </Properties>
-          <SubComponents>
-            <MenuItem class="javax.swing.JMenuItem" name="adminUsersItem">
+            <Menu class="javax.swing.JMenu" name="userMenu">
               <Properties>
-                <Property name="text" type="java.lang.String" value="Administrar Usuarios"/>
+                <Property name="background" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
+                  <Color blue="77" green="64" red="b" type="rgb"/>
+                </Property>
+                <Property name="text" type="java.lang.String" value="Usuarios"/>
               </Properties>
-              <Events>
-                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="adminUsersItemActionPerformed"/>
-              </Events>
-            </MenuItem>
-            <MenuItem class="javax.swing.JMenuItem" name="listUsersItem">
-              <Properties>
-                <Property name="text" type="java.lang.String" value="Listar Usuarios"/>
-              </Properties>
-              <Events>
-                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="listUsersItemActionPerformed"/>
-              </Events>
-            </MenuItem>
+              <SubComponents>
+                <MenuItem class="javax.swing.JMenuItem" name="adminUsersItem">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Administrar Usuarios"/>
+                  </Properties>
+                  <Events>
+                    <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="adminUsersItemActionPerformed"/>
+                  </Events>
+                </MenuItem>
+                <MenuItem class="javax.swing.JMenuItem" name="listUsersItem">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Listar Usuarios"/>
+                  </Properties>
+                  <Events>
+                    <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="listUsersItemActionPerformed"/>
+                  </Events>
+                </MenuItem>
+              </SubComponents>
+            </Menu>
           </SubComponents>
         </Menu>
         <Menu class="javax.swing.JMenu" name="employeesMenu">
           <Properties>
-            <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-              <Image iconType="3" name="/Icons/employees.png"/>
-            </Property>
             <Property name="text" type="java.lang.String" value="Empleados"/>
           </Properties>
           <SubComponents>
@@ -89,9 +80,6 @@
         </Menu>
         <Menu class="javax.swing.JMenu" name="squadMenu">
           <Properties>
-            <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-              <Image iconType="3" name="/Icons/squads.png"/>
-            </Property>
             <Property name="text" type="java.lang.String" value="Cuadrillas"/>
           </Properties>
           <SubComponents>
@@ -116,9 +104,6 @@
         </Menu>
         <Menu class="javax.swing.JMenu" name="activitiesMenu">
           <Properties>
-            <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-              <Image iconType="3" name="/Icons/activities.png"/>
-            </Property>
             <Property name="text" type="java.lang.String" value="Actividades"/>
             <Property name="toolTipText" type="java.lang.String" value=""/>
           </Properties>
@@ -151,9 +136,6 @@
         </Menu>
         <Menu class="javax.swing.JMenu" name="colonyMenu">
           <Properties>
-            <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-              <Image iconType="3" name="/Icons/colonies.png"/>
-            </Property>
             <Property name="text" type="java.lang.String" value="Colonias"/>
           </Properties>
           <SubComponents>
@@ -177,9 +159,6 @@
         </Menu>
         <Menu class="javax.swing.JMenu" name="sessionItem">
           <Properties>
-            <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-              <Image iconType="3" name="/Icons/session.png"/>
-            </Property>
             <Property name="text" type="java.lang.String" value="Sesi&#xf3;n"/>
           </Properties>
           <SubComponents>
@@ -224,7 +203,7 @@
     </DimensionLayout>
     <DimensionLayout dim="1">
       <Group type="103" groupAlignment="0" attributes="0">
-          <Component id="PanelContent" alignment="0" pref="777" max="32767" attributes="0"/>
+          <Component id="PanelContent" alignment="0" pref="796" max="32767" attributes="0"/>
       </Group>
     </DimensionLayout>
   </Layout>
@@ -244,7 +223,7 @@
         </DimensionLayout>
         <DimensionLayout dim="1">
           <Group type="103" groupAlignment="0" attributes="0">
-              <EmptySpace min="0" pref="777" max="32767" attributes="0"/>
+              <EmptySpace min="0" pref="796" max="32767" attributes="0"/>
           </Group>
         </DimensionLayout>
       </Layout>

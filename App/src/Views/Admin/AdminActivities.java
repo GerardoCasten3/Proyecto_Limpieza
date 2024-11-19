@@ -51,7 +51,6 @@ public class AdminActivities extends javax.swing.JPanel {
         deleteButton = new javax.swing.JButton();
         jPanel1 = new javax.swing.JPanel();
         jLabel2 = new javax.swing.JLabel();
-        dateChooser = new com.toedter.calendar.JDateChooser();
         activityLabel = new javax.swing.JLabel();
         activityComboBox = new javax.swing.JComboBox<>();
         colonyLabel = new javax.swing.JLabel();
@@ -60,6 +59,7 @@ public class AdminActivities extends javax.swing.JPanel {
         asignColonyButton = new javax.swing.JButton();
         jScrollPane2 = new javax.swing.JScrollPane();
         activityColoniesTable = new javax.swing.JTable();
+        jDateChooser1 = new com.toedter.calendar.JDateChooser();
 
         jTable1.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -94,7 +94,6 @@ public class AdminActivities extends javax.swing.JPanel {
 
         insertButton.setBackground(new java.awt.Color(128, 237, 153));
         insertButton.setFont(new java.awt.Font("Bahnschrift", 0, 14)); // NOI18N
-        insertButton.setForeground(new java.awt.Color(0, 0, 0));
         insertButton.setText("AGREGAR");
         insertButton.setToolTipText("Agregar una nueva actividad");
         insertButton.addActionListener(new java.awt.event.ActionListener() {
@@ -105,7 +104,6 @@ public class AdminActivities extends javax.swing.JPanel {
 
         updateButton.setBackground(new java.awt.Color(20, 145, 155));
         updateButton.setFont(new java.awt.Font("Bahnschrift", 0, 14)); // NOI18N
-        updateButton.setForeground(new java.awt.Color(0, 0, 0));
         updateButton.setText("ACTUALIZAR");
         updateButton.setToolTipText("Actualiza una actividad");
         updateButton.addActionListener(new java.awt.event.ActionListener() {
@@ -146,8 +144,6 @@ public class AdminActivities extends javax.swing.JPanel {
                 .addContainerGap(41, Short.MAX_VALUE))
         );
 
-        dateChooser.setToolTipText("Ingresa la fecha de la actividad");
-
         activityLabel.setFont(new java.awt.Font("Poppins SemiBold", 0, 14)); // NOI18N
         activityLabel.setText("Actividad:");
 
@@ -172,7 +168,6 @@ public class AdminActivities extends javax.swing.JPanel {
 
         asignColonyButton.setBackground(new java.awt.Color(255, 255, 0));
         asignColonyButton.setFont(new java.awt.Font("Bahnschrift", 0, 14)); // NOI18N
-        asignColonyButton.setForeground(new java.awt.Color(0, 0, 0));
         asignColonyButton.setText("ASIGNAR");
         asignColonyButton.setToolTipText("Asignar una colonia a la actividad");
         asignColonyButton.addActionListener(new java.awt.event.ActionListener() {
@@ -239,9 +234,9 @@ public class AdminActivities extends javax.swing.JPanel {
                             .addComponent(squadLabel)
                             .addComponent(dateLabel))
                         .addGap(18, 18, 18)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(dateChooser, javax.swing.GroupLayout.PREFERRED_SIZE, 190, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(squadComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, 281, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(squadComboBox, 0, 281, Short.MAX_VALUE)
+                            .addComponent(jDateChooser1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                         .addGap(359, 359, 359))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                         .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 825, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -253,14 +248,14 @@ public class AdminActivities extends javax.swing.JPanel {
                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(36, 36, 36)
                 .addComponent(title1)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 15, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 14, Short.MAX_VALUE)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(descriptionLabel)
                     .addComponent(descriptionTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(18, 18, 18)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addComponent(dateLabel)
-                    .addComponent(dateChooser, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jDateChooser1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(18, 18, 18)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(squadComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -288,13 +283,103 @@ public class AdminActivities extends javax.swing.JPanel {
     // Evento del botón AGREGAR, aquí se manejarán las inserciones.
     private void insertButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_insertButtonActionPerformed
         // TODO add your handling code here:
+        if (descriptionTextField.getText().trim().isEmpty() || 
+        jDateChooser1.getDate() == null) {
+
+        // Mostrar mensaje de error
+        javax.swing.JOptionPane.showMessageDialog(this, 
+            "Por favor, rellene todos los campos antes de continuar.", 
+            "Error", 
+            javax.swing.JOptionPane.ERROR_MESSAGE);
+    } else {
+        // Capturar los datos del formulario
+        String descripcion = descriptionTextField.getText().trim();
+        java.util.Date fecha = jDateChooser1.getDate();
+        String cuadrillaSeleccionada = (String) squadComboBox.getSelectedItem();
+
+        // Extraer el ID de cuadrilla del texto seleccionado
+        int idCuadrilla = Integer.parseInt(cuadrillaSeleccionada.split(":")[1].trim().split(" ")[0]);
+
+        // Crear la actividad con los datos capturados
+        Cuadrilla cuadrilla = new Cuadrilla();
+        cuadrilla.setId_cuadrilla(idCuadrilla);
+
+        ActividadLimpieza nuevaActividad = new ActividadLimpieza();
+        nuevaActividad.setDescripcion(descripcion);
+        nuevaActividad.setFecha(fecha);
+        nuevaActividad.setCuadrilla(cuadrilla);
+
+        // Llamar al método de inserción en el DAO
+        try {
+            actLimDAO.insertarActividad(nuevaActividad);
+            javax.swing.JOptionPane.showMessageDialog(this, 
+                "Actividad registrada exitosamente.", 
+                "Éxito", 
+                javax.swing.JOptionPane.INFORMATION_MESSAGE);
+
+            // Actualizar los ComboBoxes
+            updateComboBox();
+        } catch (Exception ex) {
+            javax.swing.JOptionPane.showMessageDialog(this, 
+                "Error al registrar la actividad: " + ex.getMessage(), 
+                "Error", 
+                javax.swing.JOptionPane.ERROR_MESSAGE);
+        }
+    }
          updateComboBox();//Después de insertar debe actualizar el combo box
     }//GEN-LAST:event_insertButtonActionPerformed
 
     // Evento del botón ACTUALIZAR, aquí se manejarán las actualizaciones.
     private void updateButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_updateButtonActionPerformed
         // TODO add your handling code here:
-        
+    String selectedActivity = (String) activityComboBox.getSelectedItem();
+    String[] parts = selectedActivity.split(":"); // Dividir por el primer ":"
+    
+    if (parts.length > 1) {
+        // Convertir la primera parte (ID de la actividad)
+        int activityId = Integer.parseInt(parts[0].trim());
+
+        // Obtener los datos del formulario
+        String descripcion = descriptionTextField.getText().trim();
+        java.util.Date fecha = jDateChooser1.getDate();
+        String cuadrillaSeleccionada = (String) squadComboBox.getSelectedItem();
+
+        // Extraer el ID de cuadrilla
+        int idCuadrilla = Integer.parseInt(cuadrillaSeleccionada.split(":")[1].trim().split(" ")[0]);
+
+        // Crear un objeto Cuadrilla con el ID seleccionado
+        Cuadrilla cuadrilla = new Cuadrilla();
+        cuadrilla.setId_cuadrilla(idCuadrilla);
+
+        // Crear el objeto ActividadLimpieza con los datos ingresados
+        ActividadLimpieza actividad = new ActividadLimpieza();
+        actividad.setId_actividad(activityId); // Seteamos el ID de la actividad a actualizar
+        actividad.setDescripcion(descripcion);
+        actividad.setFecha(fecha);
+        actividad.setCuadrilla(cuadrilla);
+
+        // Llamar al método de actualización en el DAO
+        try {
+            ActLimDAO.actualizarActividad(actividad);
+            javax.swing.JOptionPane.showMessageDialog(this, 
+                "Actividad actualizada exitosamente.", 
+                "Éxito", 
+                javax.swing.JOptionPane.INFORMATION_MESSAGE);
+            
+            // Actualizar el ComboBox con las actividades
+            updateComboBox();
+        } catch (Exception ex) {
+            javax.swing.JOptionPane.showMessageDialog(this, 
+                "Error al actualizar la actividad: " + ex.getMessage(), 
+                "Error", 
+                javax.swing.JOptionPane.ERROR_MESSAGE);
+        }   
+    } else {
+        javax.swing.JOptionPane.showMessageDialog(this, 
+            "Error: Formato de actividad incorrecto.", 
+            "Error", 
+            javax.swing.JOptionPane.ERROR_MESSAGE);
+    }     
         // IMPORTANTE: Tomar ID de actividad del ComboBox
          updateComboBox(); //Después de actualizar debe actualizar el combo box
     }//GEN-LAST:event_updateButtonActionPerformed
@@ -302,17 +387,41 @@ public class AdminActivities extends javax.swing.JPanel {
     // Evento del botón ELIMINAR, aquí se manejarán los elementos eliminados.
     private void deleteButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_deleteButtonActionPerformed
         // TODO add your handling code here:
-        
-        // IMPORTANTE: Tomar ID de actividad del ComboBox
-         updateComboBox();//Después de eliminar debe actualizar el combo box
+        String actividadSeleccionada = (String) activityComboBox.getSelectedItem();
+        System.out.println("Texto seleccionado: " + actividadSeleccionada); // Debug
+
+        try {
+            // Extraer el ID de la actividad
+            int idActividad = Integer.parseInt(actividadSeleccionada.split(":")[1].trim().split(" ")[0]);
+            System.out.println("ID extraído: " + idActividad); // Debug
+
+            // Confirmar eliminación
+            int confirmacion = javax.swing.JOptionPane.showConfirmDialog(this, 
+                "¿Está seguro de que desea eliminar esta actividad?\n" + actividadSeleccionada, 
+                "Confirmar eliminación", 
+                javax.swing.JOptionPane.YES_NO_OPTION);
+
+            if (confirmacion == javax.swing.JOptionPane.YES_OPTION) {
+                actLimDAO.eliminarActividad(idActividad); // Llama al DAO
+                javax.swing.JOptionPane.showMessageDialog(this, 
+                    "Actividad eliminada exitosamente.", 
+                    "Éxito", 
+                    javax.swing.JOptionPane.INFORMATION_MESSAGE);
+
+                updateComboBox(); // Actualizar ComboBox
+            }
+        } catch (Exception ex) {
+            javax.swing.JOptionPane.showMessageDialog(this, 
+                "Error al eliminar la actividad: " + ex.getMessage(), 
+                "Error", 
+                javax.swing.JOptionPane.ERROR_MESSAGE);
+        }
     }//GEN-LAST:event_deleteButtonActionPerformed
 
     private void deleteColonyButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_deleteColonyButtonActionPerformed
         // TODO add your handling code here:
-        
-        // IMPORTANTE: Tomar ID de actividad del ComboBox
-        // IMPORTANTE: Tomar ID de colonia del ComboBox
-        updateComboBox(); //Después de actualizar debe actualizar el combo box
+        // Obtener el texto seleccionado en el combo box
+        updateComboBox();
     }//GEN-LAST:event_deleteColonyButtonActionPerformed
 
     private void asignColonyButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_asignColonyButtonActionPerformed
@@ -386,13 +495,13 @@ public class AdminActivities extends javax.swing.JPanel {
     private javax.swing.ButtonGroup buttonGroup1;
     private javax.swing.JComboBox<String> colonyComboBox;
     private javax.swing.JLabel colonyLabel;
-    private com.toedter.calendar.JDateChooser dateChooser;
     private javax.swing.JLabel dateLabel;
     private javax.swing.JButton deleteButton;
     private javax.swing.JButton deleteColonyButton;
     private javax.swing.JLabel descriptionLabel;
     private javax.swing.JTextField descriptionTextField;
     private javax.swing.JButton insertButton;
+    private com.toedter.calendar.JDateChooser jDateChooser1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;

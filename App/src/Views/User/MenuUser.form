@@ -15,9 +15,6 @@
       <SubComponents>
         <Menu class="javax.swing.JMenu" name="topMenu">
           <Properties>
-            <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-              <Image iconType="3" name="/Icons/top.png"/>
-            </Property>
             <Property name="text" type="java.lang.String" value="Inicio"/>
           </Properties>
           <SubComponents>
@@ -33,9 +30,6 @@
         </Menu>
         <Menu class="javax.swing.JMenu" name="activitiesMenu">
           <Properties>
-            <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-              <Image iconType="3" name="/Icons/activities.png"/>
-            </Property>
             <Property name="text" type="java.lang.String" value="Actividades"/>
             <Property name="toolTipText" type="java.lang.String" value=""/>
           </Properties>
@@ -52,9 +46,6 @@
         </Menu>
         <Menu class="javax.swing.JMenu" name="sessionItem">
           <Properties>
-            <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-              <Image iconType="3" name="/Icons/session.png"/>
-            </Property>
             <Property name="text" type="java.lang.String" value="Sesi&#xf3;n"/>
           </Properties>
           <SubComponents>

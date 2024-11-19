@@ -73,7 +73,6 @@ public class MenuChief extends javax.swing.JFrame {
 
         jButton1.setText("jButton1");
 
-        topMenu.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Icons/top.png"))); // NOI18N
         topMenu.setText("Inicio");
 
         topMenuItem.setText("Inicio");
@@ -86,7 +85,6 @@ public class MenuChief extends javax.swing.JFrame {
 
         jMenuBar1.add(topMenu);
 
-        activitiesMenu.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Icons/activities.png"))); // NOI18N
         activitiesMenu.setText("Actividades");
         activitiesMenu.setToolTipText("");
 
@@ -100,7 +98,6 @@ public class MenuChief extends javax.swing.JFrame {
 
         jMenuBar1.add(activitiesMenu);
 
-        sessionItem.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Icons/session.png"))); // NOI18N
         sessionItem.setText("Sesión");
 
         closeSessionItem.setText("Cerrar Sesión");
@@ -129,14 +126,6 @@ public class MenuChief extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void showPanel(JPanel p) {
-        p.setSize(1200, 777);
-        p.setLocation(0, 0);
-        PanelContent.removeAll();
-        PanelContent.add(p, BorderLayout.CENTER);
-        PanelContent.revalidate();
-        PanelContent.repaint();
-    }
     private void closeSessionItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_closeSessionItemActionPerformed
         // TODO add your handling code here:
         int opcion = JOptionPane.showConfirmDialog(null, "¿Estás seguro que deseas cerrar tu sesión?", "Cerrar Sesión", JOptionPane.YES_NO_OPTION);
@@ -148,20 +137,28 @@ public class MenuChief extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_closeSessionItemActionPerformed
 
-    private void topMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_topMenuItemActionPerformed
-        // TODO add your handling code here:
-        MainChief inicio = new MainChief();
-        showPanel(inicio);
-        
-    }//GEN-LAST:event_topMenuItemActionPerformed
-
     private void userActivitiesItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_userActivitiesItemActionPerformed
         // TODO add your handling code here:
         ActivitiesChief actCPanel = new ActivitiesChief();
         showPanel(actCPanel);
-        
+
     }//GEN-LAST:event_userActivitiesItemActionPerformed
 
+    private void topMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_topMenuItemActionPerformed
+        // TODO add your handling code here:
+        MainChief inicio = new MainChief();
+        showPanel(inicio);
+
+    }//GEN-LAST:event_topMenuItemActionPerformed
+
+    private void showPanel(JPanel p) {
+        p.setSize(1200, 777);
+        p.setLocation(0, 0);
+        PanelContent.removeAll();
+        PanelContent.add(p, BorderLayout.CENTER);
+        PanelContent.revalidate();
+        PanelContent.repaint();
+    }
     /**
      * @param args the command line arguments
      */

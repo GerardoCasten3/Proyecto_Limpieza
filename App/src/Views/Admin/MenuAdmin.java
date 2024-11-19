@@ -82,12 +82,11 @@ public class MenuAdmin extends javax.swing.JFrame {
         );
         PanelContentLayout.setVerticalGroup(
             PanelContentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 777, Short.MAX_VALUE)
+            .addGap(0, 796, Short.MAX_VALUE)
         );
 
         jButton1.setText("jButton1");
 
-        topMenu.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Icons/top.png"))); // NOI18N
         topMenu.setText("Inicio");
 
         topMenuItem.setText("Inicio/Dashboard");
@@ -98,10 +97,7 @@ public class MenuAdmin extends javax.swing.JFrame {
         });
         topMenu.add(topMenuItem);
 
-        jMenuBar1.add(topMenu);
-
         userMenu.setBackground(new java.awt.Color(11, 100, 119));
-        userMenu.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Icons/users.png"))); // NOI18N
         userMenu.setText("Usuarios");
 
         adminUsersItem.setText("Administrar Usuarios");
@@ -120,9 +116,10 @@ public class MenuAdmin extends javax.swing.JFrame {
         });
         userMenu.add(listUsersItem);
 
-        jMenuBar1.add(userMenu);
+        topMenu.add(userMenu);
 
-        employeesMenu.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Icons/employees.png"))); // NOI18N
+        jMenuBar1.add(topMenu);
+
         employeesMenu.setText("Empleados");
 
         adminEmployeesItem.setText("Administrar Empleados");
@@ -144,7 +141,6 @@ public class MenuAdmin extends javax.swing.JFrame {
 
         jMenuBar1.add(employeesMenu);
 
-        squadMenu.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Icons/squads.png"))); // NOI18N
         squadMenu.setText("Cuadrillas");
 
         adminSquadsItem.setText("Administrar Cuadrillas");
@@ -166,7 +162,6 @@ public class MenuAdmin extends javax.swing.JFrame {
 
         jMenuBar1.add(squadMenu);
 
-        activitiesMenu.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Icons/activities.png"))); // NOI18N
         activitiesMenu.setText("Actividades");
         activitiesMenu.setToolTipText("");
 
@@ -196,7 +191,6 @@ public class MenuAdmin extends javax.swing.JFrame {
 
         jMenuBar1.add(activitiesMenu);
 
-        colonyMenu.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Icons/colonies.png"))); // NOI18N
         colonyMenu.setText("Colonias");
 
         adminColoniesItem.setText("Administrar Colonias");
@@ -217,7 +211,6 @@ public class MenuAdmin extends javax.swing.JFrame {
 
         jMenuBar1.add(colonyMenu);
 
-        sessionItem.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Icons/session.png"))); // NOI18N
         sessionItem.setText("Sesión");
 
         closeSessionItem.setText("Cerrar Sesión");
@@ -240,20 +233,84 @@ public class MenuAdmin extends javax.swing.JFrame {
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(PanelContent, javax.swing.GroupLayout.DEFAULT_SIZE, 777, Short.MAX_VALUE)
+            .addComponent(PanelContent, javax.swing.GroupLayout.DEFAULT_SIZE, 796, Short.MAX_VALUE)
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void showPanel(JPanel p) {
-        p.setSize(1200, 777);
-        p.setLocation(0, 0);
-        PanelContent.removeAll();
-        PanelContent.add(p, BorderLayout.CENTER);
-        PanelContent.revalidate();
-        PanelContent.repaint();
-    }
+    private void topMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_topMenuItemActionPerformed
+        // TODO add your handling code here:
+        Dashboard top = new Dashboard();
+        showPanel(top);
+    }//GEN-LAST:event_topMenuItemActionPerformed
+
+    private void listUsersItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_listUsersItemActionPerformed
+        // TODO add your handling code here:
+        ListUsers listUPanel = new ListUsers();
+        showPanel(listUPanel);
+    }//GEN-LAST:event_listUsersItemActionPerformed
+
+    private void adminUsersItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_adminUsersItemActionPerformed
+        // TODO add your handling code here:
+        AdminUsers admUserPanel = new AdminUsers();
+        showPanel(admUserPanel);
+    }//GEN-LAST:event_adminUsersItemActionPerformed
+
+    private void listEmployeesItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_listEmployeesItemActionPerformed
+        // TODO add your handling code here:
+        ListEmployees listEPanel = new ListEmployees();
+        showPanel(listEPanel);
+    }//GEN-LAST:event_listEmployeesItemActionPerformed
+
+    private void adminEmployeesItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_adminEmployeesItemActionPerformed
+        // TODO add your handling code here:
+        AdminEmployees admEmpPanel = new AdminEmployees();
+        showPanel(admEmpPanel);
+    }//GEN-LAST:event_adminEmployeesItemActionPerformed
+
+    private void listSquadsItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_listSquadsItemActionPerformed
+        // TODO add your handling code here:
+        ListSquads listSPanel = new ListSquads();
+        showPanel(listSPanel);
+    }//GEN-LAST:event_listSquadsItemActionPerformed
+
+    private void adminSquadsItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_adminSquadsItemActionPerformed
+        // TODO add your handling code here:
+        AdminSquads admSqPanel = new AdminSquads();
+        showPanel(admSqPanel);
+    }//GEN-LAST:event_adminSquadsItemActionPerformed
+
+    private void ActivitiesColoniesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ActivitiesColoniesActionPerformed
+        // TODO add your handling code here:
+        ListActivitiesColonies listACPanel = new ListActivitiesColonies();
+        showPanel(listACPanel);
+    }//GEN-LAST:event_ActivitiesColoniesActionPerformed
+
+    private void listActivitiesItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_listActivitiesItemActionPerformed
+        // TODO add your handling code here:
+        ListActivities listAPanel = new ListActivities();
+        showPanel(listAPanel);
+    }//GEN-LAST:event_listActivitiesItemActionPerformed
+
+    private void adminActivitiesItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_adminActivitiesItemActionPerformed
+        // TODO add your handling code here:
+        AdminActivities admAPanel = new AdminActivities();
+        showPanel(admAPanel);
+    }//GEN-LAST:event_adminActivitiesItemActionPerformed
+
+    private void listColoniesItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_listColoniesItemActionPerformed
+        // TODO add your handling code here:
+        ListColonies listCPanel = new ListColonies();
+        showPanel(listCPanel);
+    }//GEN-LAST:event_listColoniesItemActionPerformed
+
+    private void adminColoniesItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_adminColoniesItemActionPerformed
+        // TODO add your handling code here:
+        AdminColonies admCPanel = new AdminColonies();
+        showPanel(admCPanel);
+    }//GEN-LAST:event_adminColoniesItemActionPerformed
+
     private void closeSessionItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_closeSessionItemActionPerformed
         // TODO add your handling code here:
         int opcion = JOptionPane.showConfirmDialog(null, "¿Estás seguro que deseas cerrar tu sesión?", "Cerrar Sesión", JOptionPane.YES_NO_OPTION);
@@ -265,79 +322,14 @@ public class MenuAdmin extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_closeSessionItemActionPerformed
 
-    private void listUsersItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_listUsersItemActionPerformed
-        // TODO add your handling code here:
-        ListUsers listUPanel = new ListUsers();
-        showPanel(listUPanel);
-
-    }//GEN-LAST:event_listUsersItemActionPerformed
-
-    private void topMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_topMenuItemActionPerformed
-        // TODO add your handling code here:
-        Dashboard top = new Dashboard();
-        showPanel(top);
-    }//GEN-LAST:event_topMenuItemActionPerformed
-
-    private void listEmployeesItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_listEmployeesItemActionPerformed
-        // TODO add your handling code here:
-        ListEmployees listEPanel = new ListEmployees();
-        showPanel(listEPanel);
-    }//GEN-LAST:event_listEmployeesItemActionPerformed
-
-    private void listSquadsItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_listSquadsItemActionPerformed
-        // TODO add your handling code here:
-        ListSquads listSPanel = new ListSquads();
-        showPanel(listSPanel);
-    }//GEN-LAST:event_listSquadsItemActionPerformed
-
-    private void listActivitiesItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_listActivitiesItemActionPerformed
-        // TODO add your handling code here:
-        ListActivities listAPanel = new ListActivities();
-        showPanel(listAPanel);
-    }//GEN-LAST:event_listActivitiesItemActionPerformed
-
-    private void ActivitiesColoniesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ActivitiesColoniesActionPerformed
-        // TODO add your handling code here:
-        ListActivitiesColonies listACPanel = new ListActivitiesColonies();
-        showPanel(listACPanel);
-    }//GEN-LAST:event_ActivitiesColoniesActionPerformed
-
-    private void listColoniesItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_listColoniesItemActionPerformed
-        // TODO add your handling code here:
-        ListColonies listCPanel = new ListColonies();
-        showPanel(listCPanel);
-    }//GEN-LAST:event_listColoniesItemActionPerformed
-
-    private void adminUsersItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_adminUsersItemActionPerformed
-        // TODO add your handling code here:
-        AdminUsers admUserPanel = new AdminUsers();
-        showPanel(admUserPanel);
-    }//GEN-LAST:event_adminUsersItemActionPerformed
-
-    private void adminEmployeesItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_adminEmployeesItemActionPerformed
-        // TODO add your handling code here:
-        AdminEmployees admEmpPanel = new AdminEmployees();
-        showPanel(admEmpPanel);
-    }//GEN-LAST:event_adminEmployeesItemActionPerformed
-
-    private void adminSquadsItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_adminSquadsItemActionPerformed
-        // TODO add your handling code here:
-        AdminSquads admSqPanel = new AdminSquads();
-        showPanel(admSqPanel);
-    }//GEN-LAST:event_adminSquadsItemActionPerformed
-
-    private void adminColoniesItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_adminColoniesItemActionPerformed
-        // TODO add your handling code here:
-        AdminColonies admCPanel = new AdminColonies();
-        showPanel(admCPanel);
-    }//GEN-LAST:event_adminColoniesItemActionPerformed
-
-    private void adminActivitiesItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_adminActivitiesItemActionPerformed
-        // TODO add your handling code here:
-        AdminActivities admAPanel = new AdminActivities();
-        showPanel(admAPanel);
-    }//GEN-LAST:event_adminActivitiesItemActionPerformed
-
+    private void showPanel(JPanel p) {
+        p.setSize(1200, 777);
+        p.setLocation(0, 0);
+        PanelContent.removeAll();
+        PanelContent.add(p, BorderLayout.CENTER);
+        PanelContent.revalidate();
+        PanelContent.repaint();
+    }
     /**
      * @param args the command line arguments
      */
