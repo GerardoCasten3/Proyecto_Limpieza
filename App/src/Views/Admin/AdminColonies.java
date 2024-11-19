@@ -7,7 +7,7 @@ package Views.Admin;
 import Models.*;
 import Controller.*;
 import java.util.List;
-
+import Controller.ColoniasDAO;
 
 /**
  *
@@ -203,7 +203,54 @@ public class AdminColonies extends javax.swing.JPanel {
     // Evento del botón AGREGAR, aquí se manejarán las inserciones.
     private void insertButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_insertButtonActionPerformed
         // TODO add your handling code here:
-        updateColonies(); //Después de insertar debe actualizar el combo box
+        if (nameTextField.getText().trim().isEmpty() ||
+                zipField.getText().trim().isEmpty()||
+        roleComboBox.getSelectedIndex() == 0) {
+        
+        // Mostrar mensaje de error si faltan campos
+        javax.swing.JOptionPane.showMessageDialog(this, 
+            "Por favor, rellene todos los campos antes de continuar.", 
+            "Error", 
+            javax.swing.JOptionPane.ERROR_MESSAGE);
+    } else {
+        // Aquí iría la lógica para insertar el empleado
+         String nombre = nameTextField.getText().trim();
+        int codigoPostal;
+        try {
+            codigoPostal = Integer.parseInt(zipField.getText().trim());
+        } catch (NumberFormatException e) {
+            javax.swing.JOptionPane.showMessageDialog(this, 
+                "El código postal debe ser un número válido.", 
+                "Error", 
+                javax.swing.JOptionPane.ERROR_MESSAGE);
+            return; // Salir del método si el código postal no es válido
+        }
+        String tipoAsentamiento = (String) roleComboBox.getSelectedItem();
+
+        // Crear la colonia
+        Colonia nuevaColonia = new Colonia();
+        nuevaColonia.setNombre(nombre);
+        nuevaColonia.setCodigoPostal(codigoPostal);
+        nuevaColonia.setTipoAsentamiento(tipoAsentamiento);
+
+        // Llamar al DAO para insertar la colonia
+        try {
+            colonyDAO.agregarColonia(nuevaColonia);
+            javax.swing.JOptionPane.showMessageDialog(this, 
+                "Colonia registrada exitosamente.", 
+                "Éxito", 
+                javax.swing.JOptionPane.INFORMATION_MESSAGE);
+
+            // Actualizar ComboBoxes después de insertar
+            updateColonies();
+        } catch (Exception ex) {
+            javax.swing.JOptionPane.showMessageDialog(this, 
+                "Error al registrar la colonia: " + ex.getMessage(), 
+                "Error", 
+                javax.swing.JOptionPane.ERROR_MESSAGE);
+        }
+    }
+        updateColonies();
     }//GEN-LAST:event_insertButtonActionPerformed
 
     // Evento del botón ACTUALIZAR, aquí se manejarán las actualizaciones.
@@ -217,9 +264,37 @@ public class AdminColonies extends javax.swing.JPanel {
     // Evento del botón ELIMINAR, aquí se manejarán los elementos eliminados.
     private void deleteButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_deleteButtonActionPerformed
         // TODO add your handling code here:
-        
-        // IMPORTANTE: Tomar ID de colonia del ComboBox
-         updateColonies(); //Después de eliminar debe actualizar el combo box
+        String coloniaSeleccionada = (String) colonyComboBox.getSelectedItem();
+        System.out.println("Texto seleccionado: " + coloniaSeleccionada); // Debug
+
+        try {
+            // Extraer el ID de la colonia del texto (formato: "ID: <id> Colonia: <nombre>")
+            int idColonia = Integer.parseInt(coloniaSeleccionada.split(":")[1].trim().split(" ")[0]);
+            System.out.println("ID extraído: " + idColonia); // Debug
+
+            // Confirmar eliminación con el usuario
+            int confirmacion = javax.swing.JOptionPane.showConfirmDialog(this, 
+                "¿Está seguro de que desea eliminar esta colonia?\n" + coloniaSeleccionada, 
+                "Confirmar eliminación", 
+                javax.swing.JOptionPane.YES_NO_OPTION);
+
+            if (confirmacion == javax.swing.JOptionPane.YES_OPTION) {
+                // Llamar al DAO para eliminar la colonia
+                colonyDAO.eliminarColonia(idColonia);
+                javax.swing.JOptionPane.showMessageDialog(this, 
+                    "Colonia eliminada exitosamente.", 
+                    "Éxito", 
+                    javax.swing.JOptionPane.INFORMATION_MESSAGE);
+
+                // Actualizar los ComboBoxes y tabla
+                updateColonies();
+            }
+        } catch (Exception ex) {
+            javax.swing.JOptionPane.showMessageDialog(this, 
+                "Error al eliminar la colonia: " + ex.getMessage(), 
+                "Error", 
+                javax.swing.JOptionPane.ERROR_MESSAGE);
+        }
     }//GEN-LAST:event_deleteButtonActionPerformed
 
     // Actualizar combo box de usuarios

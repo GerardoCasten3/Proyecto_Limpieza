@@ -258,6 +258,50 @@ public class AdminEmployees extends javax.swing.JPanel {
     // Evento del botón AGREGAR, aquí se manejarán las inserciones.
     private void insertButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_insertButtonActionPerformed
         // TODO add your handling code here:
+    if (nameTextField.getText().trim().isEmpty() || 
+        jComboBox1.getSelectedIndex() == 0 || 
+        (!yesChiefButton.isSelected() && !noChiefButton.isSelected())) {
+        
+        // Mostrar mensaje de error si faltan campos
+        javax.swing.JOptionPane.showMessageDialog(this, 
+            "Por favor, rellene todos los campos antes de continuar.", 
+            "Error", 
+            javax.swing.JOptionPane.ERROR_MESSAGE);
+    } else {
+        String nombreEmpleado = nameTextField.getText().trim();
+        String cargo = (String) jComboBox1.getSelectedItem();
+        String cuadrillaSeleccionada = (String) squadComboBox.getSelectedItem();
+
+        // Extraer el ID de la cuadrilla del texto seleccionado
+        int idCuadrilla = Integer.parseInt(cuadrillaSeleccionada.split(":")[1].trim().split(" ")[0]);
+
+        // Crear el empleado
+        Empleado nuevoEmpleado = new Empleado();
+        nuevoEmpleado.setNombre(nombreEmpleado);
+        nuevoEmpleado.setCargo(cargo);
+
+        Cuadrilla cuadrilla = new Cuadrilla();
+        cuadrilla.setId_cuadrilla(idCuadrilla);
+        nuevoEmpleado.setCuadrilla(cuadrilla);
+
+        // Llamar al DAO para insertar el empleado
+        try {
+            employeeDAO.insertarEmpleado(nuevoEmpleado);
+            javax.swing.JOptionPane.showMessageDialog(this, 
+                "Empleado registrado exitosamente.", 
+                "Éxito", 
+                javax.swing.JOptionPane.INFORMATION_MESSAGE);
+
+            // Actualizar ComboBoxes después de insertar
+            updateComboBox();
+        } catch (Exception ex) {
+            javax.swing.JOptionPane.showMessageDialog(this, 
+                "Error al registrar el empleado: " + ex.getMessage(), 
+                "Error", 
+                javax.swing.JOptionPane.ERROR_MESSAGE);
+        }
+        // Actualizar los ComboBoxes después de insertar
+    }   
          updateComboBox();//Después de insertar debe actualizar el combo box
     }//GEN-LAST:event_insertButtonActionPerformed
 
@@ -272,7 +316,38 @@ public class AdminEmployees extends javax.swing.JPanel {
     // Evento del botón ELIMINAR, aquí se manejarán los elementos eliminados.
     private void deleteButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_deleteButtonActionPerformed
         // TODO add your handling code here:
-        
+        // Obtener el texto seleccionado en el combo box
+        String empleadoSeleccionado = (String) employeeComboBox.getSelectedItem();
+        System.out.println("Texto seleccionado: " + empleadoSeleccionado); // Debug
+
+        try {
+            // Extraer el ID del empleado del texto (formato: "ID: <id> Nombre: <nombre>")
+            int idEmpleado = Integer.parseInt(empleadoSeleccionado.split(":")[1].trim().split(" ")[0]);
+            System.out.println("ID extraído: " + idEmpleado); // Debug
+
+            // Confirmar eliminación con el usuario
+            int confirmacion = javax.swing.JOptionPane.showConfirmDialog(this, 
+                "¿Está seguro de que desea eliminar este empleado?\n" + empleadoSeleccionado, 
+                "Confirmar eliminación", 
+                javax.swing.JOptionPane.YES_NO_OPTION);
+
+            if (confirmacion == javax.swing.JOptionPane.YES_OPTION) {
+                // Llamar al DAO para eliminar el empleado
+                employeeDAO.eliminarEmpleado(idEmpleado);
+                javax.swing.JOptionPane.showMessageDialog(this, 
+                    "Empleado eliminado exitosamente.", 
+                    "Éxito", 
+                    javax.swing.JOptionPane.INFORMATION_MESSAGE);
+
+                // Actualizar los ComboBoxes después de eliminar
+                updateComboBox();
+            }
+        } catch (Exception ex) {
+            javax.swing.JOptionPane.showMessageDialog(this, 
+                "Error al eliminar el empleado: " + ex.getMessage(), 
+                "Error", 
+                javax.swing.JOptionPane.ERROR_MESSAGE);
+        }
         // IMPORTANTE: Tomar ID de empleado del ComboBox
          updateComboBox();//Después de eliminar debe actualizar el combo box
     }//GEN-LAST:event_deleteButtonActionPerformed
