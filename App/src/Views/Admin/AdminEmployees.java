@@ -7,13 +7,16 @@ package Views.Admin;
 import Models.*;
 import Controller.*;
 import java.util.List;
-
+import java.sql.*;
+import java.util.HashSet;
+import javax.swing.JOptionPane;
 
 /**
  *
  * @author gerar
  */
 public class AdminEmployees extends javax.swing.JPanel {
+
     UsuarioDAO userDAO = new UsuarioDAO();
     CuadrillaDAO squadDAO = new CuadrillaDAO();
     EmpleadoDAO employeeDAO = new EmpleadoDAO();
@@ -258,59 +261,274 @@ public class AdminEmployees extends javax.swing.JPanel {
     // Evento del botón AGREGAR, aquí se manejarán las inserciones.
     private void insertButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_insertButtonActionPerformed
         // TODO add your handling code here:
-         updateComboBox();//Después de insertar debe actualizar el combo box
+        if (nameTextField.getText().trim().isEmpty()
+                || jComboBox1.getSelectedIndex() == 0
+                || (!yesChiefButton.isSelected() && !noChiefButton.isSelected())
+                || squadComboBox.getSelectedIndex() == 0) {
+
+            // Mostrar mensaje de error si faltan campos
+            javax.swing.JOptionPane.showMessageDialog(this,
+                    "Por favor, rellene todos los campos antes de continuar.",
+                    "Error",
+                    javax.swing.JOptionPane.ERROR_MESSAGE);
+        } else {
+            String nombreEmpleado = nameTextField.getText().trim();
+            String cargo = (String) jComboBox1.getSelectedItem();
+            boolean isChief = false;
+            if (yesChiefButton.isSelected()) {
+                isChief = true;
+            }
+            String cuadrillaSeleccionada = (String) squadComboBox.getSelectedItem();
+            String usuarioSeleccionado = (String) userComboBox.getSelectedItem();
+
+            // Extraer el ID de la cuadrilla del texto seleccionado
+            int idCuadrilla = Integer.parseInt(cuadrillaSeleccionada.split(":")[1].trim().split(" ")[0]);
+            // Extraer el ID del usuario del texto seleccionado
+
+            // Crear el empleado
+            Empleado nuevoEmpleado = new Empleado();
+            nuevoEmpleado.setNombre(nombreEmpleado);
+            nuevoEmpleado.setCargo(cargo);
+            nuevoEmpleado.setEsJefeCuadrilla(isChief);
+
+            Cuadrilla cuadrilla = new Cuadrilla();
+            cuadrilla.setId_cuadrilla(idCuadrilla);
+            nuevoEmpleado.setCuadrilla(cuadrilla);
+
+            if (userComboBox.getSelectedIndex() != 0) {
+                int idUsuario = Integer.parseInt(usuarioSeleccionado.split(":")[1].trim().split(" ")[0]);
+                Usuario usuario = new Usuario();
+                usuario.setId_usuario(idUsuario);
+                nuevoEmpleado.setUsuario(usuario);
+            }
+
+            // Llamar al DAO para insertar el empleado
+            try {
+                employeeDAO.insertarEmpleado(nuevoEmpleado);
+                javax.swing.JOptionPane.showMessageDialog(this,
+                        "Empleado registrado exitosamente.",
+                        "Éxito",
+                        javax.swing.JOptionPane.INFORMATION_MESSAGE);
+
+                // Actualizar ComboBoxes después de insertar
+                updateComboBox();
+                limpiarCampos();
+            } catch (SQLException ex) {
+                javax.swing.JOptionPane.showMessageDialog(this,
+                        "Error al registrar el empleado: " + ex.getMessage(),
+                        "Error",
+                        javax.swing.JOptionPane.ERROR_MESSAGE);
+            }
+            // Actualizar los ComboBoxes después de insertar
+        }
+        updateComboBox();//Después de insertar debe actualizar el combo box
     }//GEN-LAST:event_insertButtonActionPerformed
 
     // Evento del botón ACTUALIZAR, aquí se manejarán las actualizaciones.
     private void updateButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_updateButtonActionPerformed
-        // TODO add your handling code here:
-        
-        // IMPORTANTE: Tomar ID de empleado del ComboBox
-         updateComboBox(); //Después de actualizar debe actualizar el combo box
+        String empleadoSeleccionado = (String) employeeComboBox.getSelectedItem();
+
+        if (employeeComboBox.getSelectedIndex() == 0) {
+            javax.swing.JOptionPane.showMessageDialog(this,
+                    "Por favor, escoge un empleado antes de actualizar.",
+                    "Error",
+                    javax.swing.JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        try {
+            // Extraer el ID del empleado del texto (formato: "ID: <id> Nombre: <nombre>")
+            int idEmpleado = Integer.parseInt(empleadoSeleccionado.split(":")[1].trim().split(" ")[0]);
+            Empleado empleado = employeeDAO.obtenerEmpleadoPorId(idEmpleado);
+
+            // Obtener los valores actuales del empleado
+            String nombreOriginal = empleado.getNombre();
+            String cargoOriginal = empleado.getCargo();
+            boolean esJefeOriginal = empleado.isEsJefeCuadrilla();
+            int idCuadrillaOriginal = empleado.getCuadrilla().getId_cuadrilla();
+            // Verificar si el usuario es nulo y asignar el valor adecuado
+            int idUsuarioOriginal = (empleado.getUsuario() != null) ? empleado.getUsuario().getId_usuario() : -1;
+
+            // Obtener los nuevos valores desde la UI
+            String nuevoNombre = nameTextField.getText().trim();
+            String nuevoCargo = (String) jComboBox1.getSelectedItem();
+            boolean esNuevoJefe = yesChiefButton.isSelected();
+
+            // Validar y actualizar el nombre solo si ha cambiado
+            if (!nuevoNombre.isEmpty() && !nuevoNombre.equals(nombreOriginal)) {
+                empleado.setNombre(nuevoNombre);
+            }
+
+            // Validar y actualizar el cargo solo si ha cambiado
+            if (jComboBox1.getSelectedIndex() != 0 && nuevoCargo != null && !nuevoCargo.equals(cargoOriginal)) {
+                empleado.setCargo(nuevoCargo);
+            }
+
+            // Validar si el valor de "Jefe de cuadrilla" ha cambiado
+            if (esNuevoJefe != esJefeOriginal) {
+                empleado.setEsJefeCuadrilla(esNuevoJefe);
+            }
+
+            // Validar si la cuadrilla ha cambiado
+            if (squadComboBox.getSelectedIndex() != 0) {
+                String cuadrillaString = (String) squadComboBox.getSelectedItem();
+                int idCuadrillaSeleccionada = Integer.parseInt(cuadrillaString.split(":")[1].trim().split(" ")[0]);
+                if (idCuadrillaSeleccionada != idCuadrillaOriginal) {
+                    Cuadrilla cuadrilla = new Cuadrilla();
+                    cuadrilla.setId_cuadrilla(idCuadrillaSeleccionada);
+                    empleado.setCuadrilla(cuadrilla);
+                }
+            } else {
+                Cuadrilla cuadrilla = new Cuadrilla();
+                cuadrilla.setId_cuadrilla(idCuadrillaOriginal);
+                empleado.setCuadrilla(cuadrilla);
+            }
+
+            // Verificar si el usuario ha cambiado
+            int idUsuarioSeleccionado = userComboBox.getSelectedIndex() != 0
+                    ? Integer.parseInt(userComboBox.getSelectedItem().toString().split(":")[1].trim().split(" ")[0])
+                    : -1; // Cambiar a -1 para evitar idUsuario 0
+
+            if (idUsuarioSeleccionado != -1 && idUsuarioSeleccionado != idUsuarioOriginal) {
+                // Solo actualizamos el usuario si se seleccionó un nuevo valor válido
+                Usuario usuario = new Usuario();
+                usuario.setId_usuario(idUsuarioSeleccionado);
+                empleado.setUsuario(usuario);
+            } else if (idUsuarioSeleccionado == -1) {
+                // Si no se selecciona un usuario, podemos dejar el usuario como nulo
+                empleado.setUsuario(null);
+            } else {
+                // Si no se seleccionó un nuevo usuario, mantenemos el valor original
+                Usuario usuario = new Usuario();
+                usuario.setId_usuario(idUsuarioOriginal);
+                empleado.setUsuario(usuario);
+            }
+
+            // Llamar al DAO para realizar la actualización en la base de datos
+            if (employeeDAO.actualizarEmpleado(empleado, idEmpleado)) {
+                javax.swing.JOptionPane.showMessageDialog(this,
+                        "Empleado actualizado exitosamente.",
+                        "Éxito",
+                        javax.swing.JOptionPane.INFORMATION_MESSAGE);
+                // Actualizar el ComboBox después de la actualización
+                updateComboBox();
+                limpiarCampos();
+            } else {
+                javax.swing.JOptionPane.showMessageDialog(this,
+                        "No se pudo actualizar el empleado.",
+                        "Error",
+                        javax.swing.JOptionPane.ERROR_MESSAGE);
+                updateComboBox();
+            }
+
+        } catch (SQLException ex) {
+            javax.swing.JOptionPane.showMessageDialog(this,
+                    "Error al actualizar el empleado: " + ex.getMessage(),
+                    "Error",
+                    javax.swing.JOptionPane.ERROR_MESSAGE);
+            updateComboBox();
+        }
     }//GEN-LAST:event_updateButtonActionPerformed
 
     // Evento del botón ELIMINAR, aquí se manejarán los elementos eliminados.
     private void deleteButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_deleteButtonActionPerformed
         // TODO add your handling code here:
-        
+        // Obtener el texto seleccionado en el combo box
+        String empleadoSeleccionado = (String) employeeComboBox.getSelectedItem();
+        if (employeeComboBox.getSelectedIndex() == 0) {
+            javax.swing.JOptionPane.showMessageDialog(this,
+                    "Por favor, escoge un empleado antes de eliminar.",
+                    "Error",
+                    javax.swing.JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        try {
+            // Extraer el ID del empleado del texto (formato: "ID: <id> Nombre: <nombre>")
+            int idEmpleado = Integer.parseInt(empleadoSeleccionado.split(":")[1].trim().split(" ")[0]);
+
+            // Confirmar eliminación con el usuario
+            int confirmacion = javax.swing.JOptionPane.showConfirmDialog(this,
+                    "¿Está seguro de que desea eliminar este empleado?\n" + empleadoSeleccionado,
+                    "Confirmar eliminación",
+                    javax.swing.JOptionPane.YES_NO_OPTION);
+
+            if (confirmacion == javax.swing.JOptionPane.YES_OPTION) {
+                // Llamar al DAO para eliminar el empleado
+                employeeDAO.eliminarEmpleado(idEmpleado);
+                javax.swing.JOptionPane.showMessageDialog(this,
+                        "Empleado eliminado exitosamente.",
+                        "Éxito",
+                        javax.swing.JOptionPane.INFORMATION_MESSAGE);
+
+                // Actualizar los ComboBoxes después de eliminar
+                updateComboBox();
+                limpiarCampos();
+            }
+        } catch (SQLException ex) {
+            javax.swing.JOptionPane.showMessageDialog(this,
+                    "Error al eliminar el empleado: " + ex.getMessage(),
+                    "Error",
+                    javax.swing.JOptionPane.ERROR_MESSAGE);
+        }
         // IMPORTANTE: Tomar ID de empleado del ComboBox
-         updateComboBox();//Después de eliminar debe actualizar el combo box
+        updateComboBox();//Después de eliminar debe actualizar el combo box
     }//GEN-LAST:event_deleteButtonActionPerformed
 
     // Actualizar combo box de usuarios
-    private void updateUsers(){
+    private void updateUsers() {
         List<Usuario> usuarios = userDAO.obtenerUsuarios();
         userComboBox.removeAllItems();
-        
-        for(Usuario usuario: usuarios){
+        userComboBox.addItem("No aplica/El empleado aun no tiene usuario.");
+
+        for (Usuario usuario : usuarios) {
             userComboBox.addItem("ID: " + usuario.getId_usuario() + " Nombre de Usuario: " + usuario.getUsername());
         }
     }
-    
-        // Actualizar combo box de usuarios
-    private void updateSquads(){
+
+    // Actualizar combo box de usuarios
+    private void updateSquads() {
         List<Cuadrilla> cuadrilla = squadDAO.obtenerCuadrillas();
         squadComboBox.removeAllItems();
-        
-        for(Cuadrilla squad: cuadrilla){
+        squadComboBox.addItem("Selecciona una cuadrilla");
+
+        for (Cuadrilla squad : cuadrilla) {
             squadComboBox.addItem("ID: " + squad.getId_cuadrilla() + " Nombre: " + squad.getNombre());
         }
     }
-    
-        // Actualizar combo box de usuarios
-    private void updateEmployees(){
+
+    // Actualizar combo box de usuarios
+    private void updateEmployees() {
         List<Empleado> empleados = employeeDAO.obtenerEmpleados();
         employeeComboBox.removeAllItems();
-        
-        for(Empleado employee: empleados){
+        employeeComboBox.addItem("Selecciona un empleado para actualizar/eliminar");
+
+        for (Empleado employee : empleados) {
             employeeComboBox.addItem("ID: " + employee.getId_empleado() + " Nombre: " + employee.getNombre());
         }
     }
-    
-    private void updateComboBox(){
+
+    private void updateComboBox() {
         updateUsers();
         updateSquads();
         updateEmployees();
+    }
+
+    private void limpiarCampos() {
+        // Limpiar el campo de texto de nombre
+        nameTextField.setText("");
+
+        // Restablecer el combo de cargo
+        jComboBox1.setSelectedIndex(0);
+
+        // Restablecer los botones de radio para jefe de cuadrilla
+        buttonGroup1.clearSelection();
+
+        // Limpiar el combo de cuadrilla
+        squadComboBox.setSelectedIndex(0);
+        // Limpiar el combo de usuario
+        userComboBox.setSelectedIndex(0); 
+
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

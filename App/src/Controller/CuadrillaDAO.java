@@ -19,10 +19,8 @@ public class CuadrillaDAO {
         String query = "INSERT INTO cuadrillas (nombre) VALUES (?)";
         try (PreparedStatement statement = connection.prepareStatement(query)) {
             statement.setString(1, cuadrilla.getNombre());
-            System.out.println("Se agregó exitosamente la cuadrilla.");
             return statement.executeUpdate() > 0;
         } catch (SQLException e) {
-            System.out.println("Error al insertar cuadrilla: " + e.getMessage());
             return false;
         }
     }
@@ -40,15 +38,12 @@ public class CuadrillaDAO {
     }
 
     // Método para actualizar una cuadrilla
-    public boolean actualizarCuadrilla(Cuadrilla cuadrilla, int id_cuadrilla) {
+    public boolean actualizarCuadrilla(Cuadrilla cuadrilla, int id_cuadrilla) throws SQLException{
         String query = "UPDATE cuadrillas SET nombre = ? WHERE id_cuadrilla = ?";
         try (PreparedStatement statement = connection.prepareStatement(query)) {
             statement.setString(1, cuadrilla.getNombre());
             statement.setInt(2, id_cuadrilla);
             return statement.executeUpdate() > 0;
-        } catch (SQLException e) {
-            System.out.println("Error al actualizar cuadrilla: " + e.getMessage());
-            return false;
         }
     }
 

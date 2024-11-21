@@ -24,44 +24,34 @@ public class UsuarioDAO {
         this.connection = DBConfig.getInstance().getConnection();
     }
 
-    public boolean insertarUsuario(Usuario usuario) {
+    public boolean insertarUsuario(Usuario usuario) throws SQLException {
         String query = "INSERT INTO usuarios (username, password, rol) VALUES (?, ?, ?)";
         try (PreparedStatement statement = connection.prepareStatement(query)) {
             statement.setString(1, usuario.getUsername());
             statement.setString(2, usuario.getPassword());
             statement.setString(3, usuario.getRol().toString());
-            System.out.println("¡Se insertó el nuevo usuario!");
+
+            // Intentamos ejecutar la inserción en la base de datos
             return statement.executeUpdate() > 0;
-        } catch (SQLException e) {
-            System.out.println("Error al insertar usuario: " + e.getMessage());
-            return false;
         }
     }
 
-    public boolean eliminarUsuario(int idUsuario) {
+    public boolean eliminarUsuario(int idUsuario) throws SQLException {
         String query = "DELETE FROM usuarios WHERE id_usuario = ?";
         try (PreparedStatement statement = connection.prepareStatement(query)) {
             statement.setInt(1, idUsuario);
-            System.out.println("Se eliminó al usuario con ID: " + idUsuario);
             return statement.executeUpdate() > 0;
-        } catch (SQLException e) {
-            System.out.println("Error al eliminar usuario: " + e.getMessage());
-            return false;
         }
     }
 
-    public boolean actualizarUsuario(Usuario usuario) {
+    public boolean actualizarUsuario(Usuario usuario) throws SQLException {
         String query = "UPDATE usuarios SET username = ?, password = ?, rol = ? WHERE id_usuario = ?";
         try (PreparedStatement statement = connection.prepareStatement(query)) {
             statement.setString(1, usuario.getUsername());
             statement.setString(2, usuario.getPassword());
             statement.setString(3, usuario.getRol().toString());
             statement.setInt(4, usuario.getId_usuario());
-            System.out.println("Se actualizó el usuario con ID: " + usuario.getId_usuario());
             return statement.executeUpdate() > 0;
-        } catch (SQLException e) {
-            System.out.println("Error al actualizar usuario: " + e.getMessage());
-            return false;
         }
     }
 
@@ -105,7 +95,6 @@ public class UsuarioDAO {
     public boolean esAdmin() {
         return Sesion.getInstance().esAdministrador();
     }
-    
 
     public List<Usuario> obtenerUsuarios() {
         if (!Sesion.getInstance().esAdministrador()) {
@@ -133,7 +122,7 @@ public class UsuarioDAO {
     }
 
     public Usuario obtenerUsuarioPorId(int idUsuario) {
-        String query = "SELECT username, rol FROM usuarios WHERE id_usuario = ?";
+        String query = "SELECT username, password, rol FROM usuarios WHERE id_usuario = ?";
         try (PreparedStatement statement = connection.prepareStatement(query)) {
             statement.setInt(1, idUsuario);
 
@@ -142,6 +131,7 @@ public class UsuarioDAO {
                     Usuario usuario = new Usuario();
                     usuario.setId_usuario(idUsuario); // Asegúrate de que el método setId_usuario() esté definido
                     usuario.setUsername(resultSet.getString("username"));
+                    usuario.setPassword(resultSet.getString("password"));
                     usuario.setRol(Rol.valueOf(resultSet.getString("rol")));
                     return usuario;
                 }

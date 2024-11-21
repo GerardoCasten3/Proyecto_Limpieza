@@ -26,7 +26,7 @@ public class EmpleadoDAO {
     }
 
     // Método para insertar un nuevo empleado
-    public boolean insertarEmpleado(Empleado empleado) {
+    public boolean insertarEmpleado(Empleado empleado) throws SQLException {
         int es_jefe = empleado.isEsJefeCuadrilla() ? 1 : 0; // Simplificación
         String query = "INSERT INTO empleados (nombre, cargo, es_jefe_cuadrilla, id_cuadrilla, id_usuario) VALUES (?, ?, ?, ?, ?)";
         try (PreparedStatement statement = connection.prepareStatement(query)) {
@@ -37,31 +37,27 @@ public class EmpleadoDAO {
             if (empleado.getCuadrilla() != null) {
                 statement.setInt(4, empleado.getCuadrilla().getId_cuadrilla());
             } else {
-                statement.setNull(4, java.sql.Types.INTEGER); // Establecer como NULL
+                statement.setNull(4, java.sql.Types.INTEGER);
             }
 
             if (empleado.getUsuario() != null) {
                 statement.setInt(5, empleado.getUsuario().getId_usuario());
             } else {
-                statement.setNull(5, java.sql.Types.INTEGER); // Establecer como NULL
+                statement.setNull(5, java.sql.Types.INTEGER);
             }
-            System.out.println("Se agregó exitosamente el empleado.");
             return statement.executeUpdate() > 0;
-        } catch (SQLException e) {
-            System.out.println("Error al insertar empleado: " + e.getMessage());
-            return false;
         }
     }
 
     // Método para eliminar un empleado
-    public boolean eliminarEmpleado(int idEmpleado) {
+    public boolean eliminarEmpleado(int idEmpleado) throws SQLException {
         String query = "DELETE FROM empleados WHERE id_empleado = ?";
         try (PreparedStatement statement = connection.prepareStatement(query)) {
+            // Configurar el parámetro del PreparedStatement
             statement.setInt(1, idEmpleado);
+
+            // Ejecutar la consulta y verificar si se afectaron filas
             return statement.executeUpdate() > 0;
-        } catch (SQLException e) {
-            System.out.println("Error al eliminar empleado: " + e.getMessage());
-            return false;
         }
     }
 
@@ -165,7 +161,7 @@ public class EmpleadoDAO {
     }
 
     // Método para actualizar un empleado completo por su id_empleado
-    public boolean actualizarEmpleado(Empleado empleado, int id_empleado) {
+    public boolean actualizarEmpleado(Empleado empleado, int id_empleado) throws SQLException {
         String query = "UPDATE empleados SET nombre = ?, cargo = ?, es_jefe_cuadrilla = ?, id_cuadrilla = ?, id_usuario = ? WHERE id_empleado = ?";
         try (PreparedStatement statement = connection.prepareStatement(query)) {
             statement.setString(1, empleado.getNombre());
@@ -189,10 +185,8 @@ public class EmpleadoDAO {
             // Establecer id_empleado para la condición WHERE
             statement.setInt(6, id_empleado);
 
-            return statement.executeUpdate() > 0; // Retorna true si la actualización fue exitosa
-        } catch (SQLException e) {
-            System.out.println("Error al actualizar empleado: " + e.getMessage());
-            return false;
+            // Retorna true si la actualización fue exitosa
+            return statement.executeUpdate() > 0;
         }
     }
 

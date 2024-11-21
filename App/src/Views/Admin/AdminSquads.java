@@ -7,13 +7,14 @@ package Views.Admin;
 import Models.*;
 import Controller.*;
 import java.util.List;
-
+import java.sql.*;
 
 /**
  *
  * @author gerar
  */
 public class AdminSquads extends javax.swing.JPanel {
+
     CuadrillaDAO squadDAO = new CuadrillaDAO();
 
     /**
@@ -174,35 +175,168 @@ public class AdminSquads extends javax.swing.JPanel {
     // Evento del botón AGREGAR, aquí se manejarán las inserciones.
     private void insertButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_insertButtonActionPerformed
         // TODO add your handling code here:
+        // TODO add your handling code here:
+        if (nameTextField.getText().trim().isEmpty()) {
+
+            // Mostrar mensaje de error si faltan campos
+            javax.swing.JOptionPane.showMessageDialog(this,
+                    "Por favor, rellene todos los campos antes de continuar.",
+                    "Error",
+                    javax.swing.JOptionPane.ERROR_MESSAGE);
+        } else {
+            String nombreCuadrilla = nameTextField.getText().trim();
+
+            // Crear una nueva cuadrilla
+            Cuadrilla nuevaCuadrilla = new Cuadrilla();
+            nuevaCuadrilla.setNombre(nombreCuadrilla);
+
+            // Llamar al DAO para insertar la cuadrilla
+            try {
+                squadDAO.insertarCuadrilla(nuevaCuadrilla);
+                javax.swing.JOptionPane.showMessageDialog(this,
+                        "Cuadrilla registrada exitosamente.",
+                        "Éxito",
+                        javax.swing.JOptionPane.INFORMATION_MESSAGE);
+
+                // Actualizar ComboBoxes después de insertar
+                updateSquads();
+            } catch (Exception ex) {
+                javax.swing.JOptionPane.showMessageDialog(this,
+                        "Error al registrar la cuadrilla: " + ex.getMessage(),
+                        "Error",
+                        javax.swing.JOptionPane.ERROR_MESSAGE);
+            }
+            // Actualizar los ComboBoxes después de insertar
+        }
+        limpiarCampos();
         updateSquads(); //Después de insertar debe actualizar el combo box
+        //GEN-LAST:event_insertButtonActionPerformed
     }//GEN-LAST:event_insertButtonActionPerformed
 
-    // Evento del botón ACTUALIZAR, aquí se manejarán las actualizaciones.
+// Evento del botón ACTUALIZAR, aquí se manejarán las actualizaciones.
     private void updateButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_updateButtonActionPerformed
         // TODO add your handling code here:
-        
+        // Verificamos que se haya seleccionado una cuadrilla para actualizar
+        String cuadrillaSeleccionada = (String) squadComboBox.getSelectedItem();
+        if (squadComboBox.getSelectedIndex() == 0) {
+            javax.swing.JOptionPane.showMessageDialog(this,
+                    "Por favor, escoge una cuadrilla antes de actualizar.",
+                    "Error",
+                    javax.swing.JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        try {
+            // Extraer el ID de la cuadrilla del texto (formato: "ID: <id> Nombre: <nombre>")
+            int idCuadrilla = Integer.parseInt(cuadrillaSeleccionada.split(":")[1].trim().split(" ")[0]);
+            Cuadrilla cuadrilla = squadDAO.obtenerCuadrillaPorId(idCuadrilla); // Obtener la cuadrilla desde el DAO
+
+            // Obtener los valores actuales de la cuadrilla
+            String nombreOriginal = cuadrilla.getNombre();
+
+            // Obtener el nuevo valor del nombre desde la UI
+            String nuevoNombre = nameTextField.getText().trim();
+
+            // Validar que el nombre no esté vacío
+            if (nuevoNombre.isEmpty()) {
+                javax.swing.JOptionPane.showMessageDialog(this,
+                        "El nombre de la cuadrilla no puede estar vacío.",
+                        "Error",
+                        javax.swing.JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+            // Validar y actualizar el nombre solo si ha cambiado
+            if (!nuevoNombre.equals(nombreOriginal)) {
+                cuadrilla.setNombre(nuevoNombre); // Actualizamos el nombre si ha cambiado
+            }
+
+            // Llamar al DAO para realizar la actualización en la base de datos
+            if (squadDAO.actualizarCuadrilla(cuadrilla, idCuadrilla)) {
+                javax.swing.JOptionPane.showMessageDialog(this,
+                        "Cuadrilla actualizada exitosamente.",
+                        "Éxito",
+                        javax.swing.JOptionPane.INFORMATION_MESSAGE);
+                // Actualizar ComboBox después de la actualización
+                updateSquads();
+                limpiarCampos();
+            } else {
+                javax.swing.JOptionPane.showMessageDialog(this,
+                        "No se pudo actualizar la cuadrilla.",
+                        "Error",
+                        javax.swing.JOptionPane.ERROR_MESSAGE);
+                updateSquads();
+            }
+
+        } catch (SQLException ex) {
+            javax.swing.JOptionPane.showMessageDialog(this,
+                    "Error al actualizar la cuadrilla: " + ex.getMessage(),
+                    "Error",
+                    javax.swing.JOptionPane.ERROR_MESSAGE);
+            updateSquads();
+        } catch (Exception ex) {  // Para otros tipos de excepciones
+            javax.swing.JOptionPane.showMessageDialog(this,
+                    "Error inesperado: " + ex.getMessage(),
+                    "Error",
+                    javax.swing.JOptionPane.ERROR_MESSAGE);
+        }
         // IMPORTANTE: Tomar ID de cuadrilla del ComboBox
-         updateSquads(); //Después de actualizar debe actualizar el combo box
+        updateSquads(); //Después de actualizar debe actualizar el combo box
     }//GEN-LAST:event_updateButtonActionPerformed
 
     // Evento del botón ELIMINAR, aquí se manejarán los elementos eliminados.
     private void deleteButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_deleteButtonActionPerformed
         // TODO add your handling code here:
-        
+        // Obtener el texto seleccionado en el combo box
+        String cuadrillaSeleccionada = (String) squadComboBox.getSelectedItem();
+
+        try {
+            // Extraer el ID de la cuadrilla del texto (formato: "ID: <id> Nombre: <nombre>")
+            int idCuadrilla = Integer.parseInt(cuadrillaSeleccionada.split(":")[1].trim().split(" ")[0]);
+
+            // Confirmar eliminación con el usuario
+            int confirmacion = javax.swing.JOptionPane.showConfirmDialog(this,
+                    "¿Está seguro de que desea eliminar esta cuadrilla?\n" + cuadrillaSeleccionada,
+                    "Confirmar eliminación",
+                    javax.swing.JOptionPane.YES_NO_OPTION);
+
+            if (confirmacion == javax.swing.JOptionPane.YES_OPTION) {
+                // Llamar al DAO para eliminar la cuadrilla
+                squadDAO.eliminarCuadrilla(idCuadrilla);
+                javax.swing.JOptionPane.showMessageDialog(this,
+                        "Cuadrilla eliminada exitosamente.",
+                        "Éxito",
+                        javax.swing.JOptionPane.INFORMATION_MESSAGE);
+
+                // Actualizar ComboBoxes después de eliminar
+                updateSquads();
+            }
+        } catch (Exception ex) {
+            javax.swing.JOptionPane.showMessageDialog(this,
+                    "Error al eliminar la cuadrilla: " + ex.getMessage(),
+                    "Error",
+                    javax.swing.JOptionPane.ERROR_MESSAGE);
+        }
         // IMPORTANTE: Tomar ID de cuadrilla del ComboBox
-         updateSquads(); //Después de eliminar debe actualizar el combo box
+        updateSquads(); //Después de eliminar debe actualizar el combo box
+        // IMPORTANTE: Tomar ID de cuadrilla del ComboBox
+        updateSquads(); //Después de eliminar debe actualizar el combo box
     }//GEN-LAST:event_deleteButtonActionPerformed
 
     // Actualizar combo box de usuarios
-    private void updateSquads(){
+    private void updateSquads() {
         List<Cuadrilla> squads = squadDAO.obtenerCuadrillas();
         squadComboBox.removeAllItems();
-        
-        for(Cuadrilla squad: squads){
+        squadComboBox.addItem("Escoge una cuadrilla para actualizar/eliminar.");
+
+        for (Cuadrilla squad : squads) {
             squadComboBox.addItem("ID: " + squad.getId_cuadrilla() + " Nombre de Cuadrilla: " + squad.getNombre());
         }
     }
 
+    private void limpiarCampos(){
+        nameTextField.setText("");
+    }
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton deleteButton;
     private javax.swing.JButton insertButton;

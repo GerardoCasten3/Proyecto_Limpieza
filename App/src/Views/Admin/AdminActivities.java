@@ -8,13 +8,15 @@ import Models.*;
 import Controller.*;
 import java.util.List;
 import javax.swing.table.DefaultTableModel;
-
+import java.util.Date;
+import java.sql.*;
 
 /**
  *
  * @author gerar
  */
 public class AdminActivities extends javax.swing.JPanel {
+
     ActividadLimpiezaDAO actLimDAO = new ActividadLimpiezaDAO();
     CuadrillaDAO squadDAO = new CuadrillaDAO();
     ColoniasDAO colDAO = new ColoniasDAO();
@@ -288,78 +290,298 @@ public class AdminActivities extends javax.swing.JPanel {
     // Evento del botón AGREGAR, aquí se manejarán las inserciones.
     private void insertButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_insertButtonActionPerformed
         // TODO add your handling code here:
-         updateComboBox();//Después de insertar debe actualizar el combo box
+        Date fechaActual = new Date();
+        if (descriptionTextField.getText().trim().isEmpty()
+                || dateChooser.getDate() == null
+                || squadComboBox.getSelectedIndex() == 0) {
+
+            // Mostrar mensaje de error
+            javax.swing.JOptionPane.showMessageDialog(this,
+                    "Por favor, rellene todos los campos antes de continuar.",
+                    "Error",
+                    javax.swing.JOptionPane.ERROR_MESSAGE);
+        } else if (dateChooser.getDate().before(fechaActual)) {
+            // Mostrar mensaje de error
+            javax.swing.JOptionPane.showMessageDialog(this,
+                    "Por favor, seleccione una fecha válida.",
+                    "Error",
+                    javax.swing.JOptionPane.ERROR_MESSAGE);
+        } else {
+            // Capturar los datos del formulario
+            String descripcion = descriptionTextField.getText().trim();
+            java.util.Date fecha = dateChooser.getDate();
+            String cuadrillaSeleccionada = (String) squadComboBox.getSelectedItem();
+
+            // Extraer el ID de cuadrilla del texto seleccionado
+            int idCuadrilla = Integer.parseInt(cuadrillaSeleccionada.split(":")[1].trim().split(" ")[0]);
+
+            // Crear la actividad con los datos capturados
+            Cuadrilla cuadrilla = new Cuadrilla();
+            cuadrilla.setId_cuadrilla(idCuadrilla);
+
+            ActividadLimpieza nuevaActividad = new ActividadLimpieza();
+            nuevaActividad.setDescripcion(descripcion);
+            nuevaActividad.setFecha(fecha);
+            nuevaActividad.setCuadrilla(cuadrilla);
+
+            // Llamar al método de inserción en el DAO
+            try {
+                actLimDAO.insertarActividad(nuevaActividad);
+                javax.swing.JOptionPane.showMessageDialog(this,
+                        "Actividad registrada exitosamente.",
+                        "Éxito",
+                        javax.swing.JOptionPane.INFORMATION_MESSAGE);
+
+                // Actualizar los ComboBoxes
+                updateComboBox();
+                limpiarCampos();
+            } catch (Exception ex) {
+                javax.swing.JOptionPane.showMessageDialog(this,
+                        "Error al registrar la actividad: " + ex.getMessage(),
+                        "Error",
+                        javax.swing.JOptionPane.ERROR_MESSAGE);
+            }
+        }
+        updateComboBox();//Después de insertar debe actualizar el combo box
     }//GEN-LAST:event_insertButtonActionPerformed
 
     // Evento del botón ACTUALIZAR, aquí se manejarán las actualizaciones.
     private void updateButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_updateButtonActionPerformed
         // TODO add your handling code here:
-        
+        // Obtener la actividad seleccionada
+        String actividadSeleccionada = (String) activityComboBox.getSelectedItem();
+
+        if (activityComboBox.getSelectedIndex() == 0) {
+            javax.swing.JOptionPane.showMessageDialog(this,
+                    "Por favor, escoge una actividad antes de actualizar.",
+                    "Error",
+                    javax.swing.JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        try {
+            // Extraer el ID de la actividad del texto (formato: "ID: <id> Descripción: <descripcion>")
+            int idActividad = Integer.parseInt(actividadSeleccionada.split(":")[1].trim().split(" ")[0]);
+            ActividadLimpieza actividad = actLimDAO.buscarActividadPorId(idActividad); // Obtener la actividad desde el DAO
+
+            // Obtener los valores actuales de la actividad
+            String descripcionOriginal = actividad.getDescripcion();
+            Date fechaOriginal = actividad.getFecha();
+            int idCuadrillaOriginal = actividad.getCuadrilla().getId_cuadrilla();
+
+            // Obtener los nuevos valores desde la UI
+            String nuevaDescripcion = descriptionTextField.getText().trim();
+            Date nuevaFecha = dateChooser.getDate();
+            String cuadrillaSeleccionada = (String) squadComboBox.getSelectedItem();
+
+            // Validar que los campos no estén vacíos y que la fecha sea válida
+            Date fechaActual = new Date();
+
+            // Validar y actualizar la descripción solo si ha cambiado
+            if (!nuevaDescripcion.isEmpty() && !nuevaDescripcion.equals(descripcionOriginal)) {
+                actividad.setDescripcion(nuevaDescripcion);
+            }
+
+            // Validar y actualizar la fecha solo si ha cambiado
+            if (nuevaFecha != null && !nuevaFecha.equals(fechaOriginal)) {
+                if (nuevaFecha.before(fechaActual)) {
+                    javax.swing.JOptionPane.showMessageDialog(this,
+                            "Por favor, seleccione una fecha válida.",
+                            "Error",
+                            javax.swing.JOptionPane.ERROR_MESSAGE);
+                    return;
+                } else {
+                    actividad.setFecha(nuevaFecha);
+                }
+            }
+
+            // Validar y actualizar la cuadrilla solo si ha cambiado
+            if (squadComboBox.getSelectedIndex() != 0) {
+                int idCuadrillaSeleccionada = Integer.parseInt(cuadrillaSeleccionada.split(":")[1].trim().split(" ")[0]);
+                if (idCuadrillaSeleccionada != idCuadrillaOriginal) {
+                    Cuadrilla nuevaCuadrilla = new Cuadrilla();
+                    nuevaCuadrilla.setId_cuadrilla(idCuadrillaSeleccionada);
+                    actividad.setCuadrilla(nuevaCuadrilla);
+                }
+            }
+
+            // Llamar al DAO para realizar la actualización en la base de datos
+            if (actLimDAO.actualizarActividad(actividad, idActividad)) {
+                javax.swing.JOptionPane.showMessageDialog(this,
+                        "Actividad actualizada exitosamente.",
+                        "Éxito",
+                        javax.swing.JOptionPane.INFORMATION_MESSAGE);
+                // Actualizar ComboBox después de la actualización
+                updateComboBox();
+                limpiarCampos();
+            } else {
+                javax.swing.JOptionPane.showMessageDialog(this,
+                        "No se pudo actualizar la actividad.",
+                        "Error",
+                        javax.swing.JOptionPane.ERROR_MESSAGE);
+                updateComboBox();
+            }
+
+        } catch (SQLException ex) {
+            javax.swing.JOptionPane.showMessageDialog(this,
+                    "Error al actualizar la actividad: " + ex.getMessage(),
+                    "Error",
+                    javax.swing.JOptionPane.ERROR_MESSAGE);
+            updateComboBox();
+        }
         // IMPORTANTE: Tomar ID de actividad del ComboBox
-         updateComboBox(); //Después de actualizar debe actualizar el combo box
+        updateComboBox(); //Después de actualizar debe actualizar el combo box
     }//GEN-LAST:event_updateButtonActionPerformed
 
     // Evento del botón ELIMINAR, aquí se manejarán los elementos eliminados.
     private void deleteButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_deleteButtonActionPerformed
         // TODO add your handling code here:
-        
+// TODO add your handling code here:
+        String actividadSeleccionada = (String) activityComboBox.getSelectedItem();
+
+        try {
+            // Extraer el ID de la actividad
+            int idActividad = Integer.parseInt(actividadSeleccionada.split(":")[1].trim().split(" ")[0]);
+
+            // Confirmar eliminación
+            int confirmacion = javax.swing.JOptionPane.showConfirmDialog(this,
+                    "¿Está seguro de que desea eliminar esta actividad?\n" + actividadSeleccionada,
+                    "Confirmar eliminación",
+                    javax.swing.JOptionPane.YES_NO_OPTION);
+
+            if (confirmacion == javax.swing.JOptionPane.YES_OPTION) {
+                actLimDAO.eliminarActividad(idActividad); // Llama al DAO
+                javax.swing.JOptionPane.showMessageDialog(this,
+                        "Actividad eliminada exitosamente.",
+                        "Éxito",
+                        javax.swing.JOptionPane.INFORMATION_MESSAGE);
+
+                updateComboBox(); // Actualizar ComboBox
+            }
+        } catch (Exception ex) {
+            javax.swing.JOptionPane.showMessageDialog(this,
+                    "Error al eliminar la actividad: " + ex.getMessage(),
+                    "Error",
+                    javax.swing.JOptionPane.ERROR_MESSAGE);
+        }
         // IMPORTANTE: Tomar ID de actividad del ComboBox
-         updateComboBox();//Después de eliminar debe actualizar el combo box
+        updateComboBox();//Después de eliminar debe actualizar el combo box
     }//GEN-LAST:event_deleteButtonActionPerformed
 
     private void deleteColonyButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_deleteColonyButtonActionPerformed
         // TODO add your handling code here:
-        
-        // IMPORTANTE: Tomar ID de actividad del ComboBox
+        String actividadSeleccionada = (String) activityComboBox.getSelectedItem();
+        String coloniaSeleccionada = (String) colonyComboBox.getSelectedItem();
+
+        if (activityComboBox.getSelectedIndex() == 0 || colonyComboBox.getSelectedIndex() == 0) {
+            javax.swing.JOptionPane.showMessageDialog(this,
+                    "Por favor, escoge una actividad y una colonia antes de actualizar.",
+                    "Error",
+                    javax.swing.JOptionPane.ERROR_MESSAGE);
+            return;
+        } else {
+            int idActividad = Integer.parseInt(actividadSeleccionada.split(":")[1].trim().split(" ")[0]);
+            int idColonia = Integer.parseInt(coloniaSeleccionada.split(":")[1].trim().split(" ")[0]);
+
+            // Confirmar eliminación
+            int confirmacion = javax.swing.JOptionPane.showConfirmDialog(this,
+                    "¿Está seguro de que desea eliminar la colonia\n" + coloniaSeleccionada + " \n de la actividad?\n" + actividadSeleccionada,
+                    "Confirmar eliminación",
+                    javax.swing.JOptionPane.YES_NO_OPTION);
+
+            if (confirmacion == javax.swing.JOptionPane.YES_OPTION) {
+                activityCD.eliminarActividadColonia(idActividad, idColonia); // Llama al DAO
+                javax.swing.JOptionPane.showMessageDialog(this,
+                        "Colonia eliminada exitosamente.",
+                        "Éxito",
+                        javax.swing.JOptionPane.INFORMATION_MESSAGE);
+
+                updateComboBox(); // Actualizar ComboBox
+            }
+        }
         // IMPORTANTE: Tomar ID de colonia del ComboBox
         updateComboBox(); //Después de actualizar debe actualizar el combo box
     }//GEN-LAST:event_deleteColonyButtonActionPerformed
 
     private void asignColonyButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_asignColonyButtonActionPerformed
         // TODO add your handling code here:
-        
-        // IMPORTANTE: Tomar ID de actividad del ComboBox
+// TODO add your handling code here:
+        String actividadSeleccionada = (String) activityComboBox.getSelectedItem();
+        String coloniaSeleccionada = (String) colonyComboBox.getSelectedItem();
+
+        if (activityComboBox.getSelectedIndex() == 0 || colonyComboBox.getSelectedIndex() == 0) {
+            javax.swing.JOptionPane.showMessageDialog(this,
+                    "Por favor, escoge una actividad y una colonia antes de actualizar.",
+                    "Error",
+                    javax.swing.JOptionPane.ERROR_MESSAGE);
+            return;
+        } else {
+            int idActividad = Integer.parseInt(actividadSeleccionada.split(":")[1].trim().split(" ")[0]);
+            int idColonia = Integer.parseInt(coloniaSeleccionada.split(":")[1].trim().split(" ")[0]);
+            ActividadLimpieza actividad = new ActividadLimpieza();
+            actividad.setId_actividad(idActividad);
+            Colonia colonia = new Colonia();
+            colonia.setId_colonia(idColonia);
+            // Confirmar eliminación
+            int confirmacion = javax.swing.JOptionPane.showConfirmDialog(this,
+                    "¿Está seguro de que desea agregar la colonia\n" + coloniaSeleccionada + " \n a la actividad?\n" + actividadSeleccionada,
+                    "Confirmar inserción",
+                    javax.swing.JOptionPane.YES_NO_OPTION);
+
+            if (confirmacion == javax.swing.JOptionPane.YES_OPTION) {
+                activityCD.agregarActividadColonia(actividad, colonia); // Llama al DAO
+                javax.swing.JOptionPane.showMessageDialog(this,
+                        "Colonia agregada exitosamente.",
+                        "Éxito",
+                        javax.swing.JOptionPane.INFORMATION_MESSAGE);
+
+                updateComboBox(); // Actualizar ComboBox
+            }
+        }
         // IMPORTANTE: Tomar ID de colonia del ComboBox
         updateComboBox();//Después de eliminar debe actualizar el combo box
     }//GEN-LAST:event_asignColonyButtonActionPerformed
 
     // Actualizar combo box de cuadrillas
-    private void updateSquads(){
+    private void updateSquads() {
         List<Cuadrilla> squads = squadDAO.obtenerCuadrillas();
         squadComboBox.removeAllItems();
-        
-        for(Cuadrilla squad: squads){
+        squadComboBox.addItem("Selecciona una cuadrilla para asignar la actividad");
+
+        for (Cuadrilla squad : squads) {
             squadComboBox.addItem("ID: " + squad.getId_cuadrilla() + " Nombre de Cuadrilla: " + squad.getNombre());
         }
     }
-    
-        // Actualizar combo box de actividades
-    private void updateActivities(){
+
+    // Actualizar combo box de actividades
+    private void updateActivities() {
         List<ActividadLimpieza> activities = actLimDAO.obtenerTodasLasActividades();
         activityComboBox.removeAllItems();
-        
-        for(ActividadLimpieza activity: activities){
+        activityComboBox.addItem("Selecciona una actividad para actualizar/eliminar");
+
+        for (ActividadLimpieza activity : activities) {
             activityComboBox.addItem("ID: " + activity.getId_actividad() + " Nombre: " + activity.getDescripcion());
         }
     }
-    
-        // Actualizar combo box de colonias
-     private void updateColonies(){
+
+    // Actualizar combo box de colonias
+    private void updateColonies() {
         List<Colonia> colonies = colDAO.obtenerTodasLasColonias();
         colonyComboBox.removeAllItems();
-        
-        for(Colonia colony: colonies){
+        colonyComboBox.addItem("Selecciona una colonia para asignar/desasignar una actividad");
+
+        for (Colonia colony : colonies) {
             colonyComboBox.addItem("ID: " + colony.getId_colonia() + " Colonia: " + colony.getNombre());
         }
     }
-    
-    private void updateComboBox(){
+
+    private void updateComboBox() {
         updateActivities();
         updateSquads();
         updateColonies();
         showActivities();
     }
-    
+
     private void showActivities() {
         List<ActividadColonia> actividadesColonia = activityCD.obtenerActividadesColonia();
         DefaultTableModel model = (DefaultTableModel) activityColoniesTable.getModel();
@@ -370,12 +592,19 @@ public class AdminActivities extends javax.swing.JPanel {
             // Para cada colonia asociada a la actividad, agregar una fila
             for (Colonia colonia : actividadColonia.getColonias()) {
                 Object[] fila = {
-                    actividadColonia.getActividad().getDescripcion(), 
-                    colonia.getNombre() 
+                    actividadColonia.getActividad().getDescripcion(),
+                    colonia.getNombre()
                 };
                 model.addRow(fila);
             }
         }
+    }
+
+    private void limpiarCampos() {
+        descriptionTextField.setText("");
+        squadComboBox.setSelectedIndex(0);
+        dateChooser.setDate(null);
+
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

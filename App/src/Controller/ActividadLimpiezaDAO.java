@@ -44,7 +44,7 @@ public class ActividadLimpiezaDAO {
     }
 
     // Método para actualizar una actividad de limpieza
-    public void actualizarActividad(ActividadLimpieza actividad, int id) {
+    public boolean actualizarActividad(ActividadLimpieza actividad, int id) throws SQLException {
         String sql = "UPDATE actividades_limpieza SET descripcion = ?, fecha = ?, retroalimentacion = ?, imagenEvidencia = ?, id_cuadrilla = ? WHERE id_actividad = ?";
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setString(1, actividad.getDescripcion());
@@ -54,8 +54,7 @@ public class ActividadLimpiezaDAO {
             stmt.setInt(5, actividad.getCuadrilla().getId_cuadrilla());
             stmt.setInt(6, id);
             stmt.executeUpdate();
-        } catch (SQLException e) {
-            System.err.println("Error al actualizar actividad: " + e.getMessage());
+            return stmt.executeUpdate() > 0;
         }
     }
 
@@ -172,33 +171,53 @@ public class ActividadLimpiezaDAO {
 
         return actividad;
     }
-    
+
     public List<ActividadLimpieza> obtenerActividadesPorIdCuadrilla(int idCuadrilla) {
-    CuadrillaDAO cuadrDAO = new CuadrillaDAO();
-    List<ActividadLimpieza> actividades = new ArrayList<>();
-    String sql = "SELECT * FROM actividades_limpieza WHERE id_cuadrilla = ?";
+        CuadrillaDAO cuadrDAO = new CuadrillaDAO();
+        List<ActividadLimpieza> actividades = new ArrayList<>();
+        String sql = "SELECT * FROM actividades_limpieza WHERE id_cuadrilla = ?";
 
-    try (PreparedStatement stmt = connection.prepareStatement(sql)) {
-        stmt.setInt(1, idCuadrilla);
-        ResultSet rs = stmt.executeQuery();
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setInt(1, idCuadrilla);
+            ResultSet rs = stmt.executeQuery();
 
-        while (rs.next()) {
-            int id_actividad = rs.getInt("id_actividad");
-            String descripcion = rs.getString("descripcion");
-            Date fecha = rs.getDate("fecha");
-            String retroalimentacion = rs.getString("retroalimentacion");
-            String imagenEvidencia = rs.getString("imagenEvidencia");
-            boolean completado = rs.getBoolean("completado");
+            while (rs.next()) {
+                int id_actividad = rs.getInt("id_actividad");
+                String descripcion = rs.getString("descripcion");
+                Date fecha = rs.getDate("fecha");
+                String retroalimentacion = rs.getString("retroalimentacion");
+                String imagenEvidencia = rs.getString("imagenEvidencia");
+                boolean completado = rs.getBoolean("completado");
 
-            // Obtener la cuadrilla correspondiente
-            Cuadrilla cuadrilla = cuadrDAO.obtenerCuadrillaPorId(idCuadrilla);
-            ActividadLimpieza actividad = new ActividadLimpieza(id_actividad, descripcion, fecha, retroalimentacion, imagenEvidencia, cuadrilla,completado);
-            actividades.add(actividad);
+                // Obtener la cuadrilla correspondiente
+                Cuadrilla cuadrilla = cuadrDAO.obtenerCuadrillaPorId(idCuadrilla);
+                ActividadLimpieza actividad = new ActividadLimpieza(id_actividad, descripcion, fecha, retroalimentacion, imagenEvidencia, cuadrilla, completado);
+                actividades.add(actividad);
+            }
+        } catch (SQLException e) {
+            System.err.println("Error al obtener actividades por id_cuadrilla: " + e.getMessage());
         }
-    } catch (SQLException e) {
-        System.err.println("Error al obtener actividades por id_cuadrilla: " + e.getMessage());
-    }
 
-    return actividades;
+        return actividades;
+    }
+    
+    public List<Object[]> obtenerResumenPorCuadrilla() throws SQLException {
+    List<Object[]> resumen = new ArrayList<>();
+    String query = "SELECT c.nombre, "
+                 + "COUNT(CASE WHEN a.completado = TRUE THEN 1 END) AS actividades_completadas, "
+                 + "COUNT(CASE WHEN a.completado = FALSE THEN 1 END) AS actividades_no_completadas "
+                 + "FROM cuadrillas c "
+                 + "LEFT JOIN actividades_limpieza a ON c.id_cuadrilla = a.id_cuadrilla "
+                 + "GROUP BY c.id_cuadrilla";
+    try (PreparedStatement ps = connection.prepareStatement(query);
+         ResultSet rs = ps.executeQuery()) {
+        while (rs.next()) {
+            String nombreCuadrilla = rs.getString("nombre");
+            int actividadesCompletadas = rs.getInt("actividades_completadas");
+            int actividadesNoCompletadas = rs.getInt("actividades_no_completadas");
+            resumen.add(new Object[]{nombreCuadrilla, actividadesCompletadas, actividadesNoCompletadas});
+        }
+    }
+    return resumen;
 }
 }

@@ -7,13 +7,14 @@ package Views.Admin;
 import Models.*;
 import Controller.*;
 import java.util.List;
-
+import java.sql.*;
 
 /**
  *
  * @author gerar
  */
 public class AdminUsers extends javax.swing.JPanel {
+
     UsuarioDAO userDAO = new UsuarioDAO();
 
     /**
@@ -221,33 +222,223 @@ public class AdminUsers extends javax.swing.JPanel {
     // Evento del botón AGREGAR, aquí se manejarán las inserciones.
     private void insertButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_insertButtonActionPerformed
         // TODO add your handling code here:
+        if (usernameTextField.getText().trim().isEmpty()
+                || passwordField.getText().trim().isEmpty()
+                || passwordRepeatField.getText().trim().isEmpty()
+                || roleComboBox.getSelectedIndex() == 0) {
+
+            // Mostrar mensaje de error si faltan campos
+            javax.swing.JOptionPane.showMessageDialog(this,
+                    "Por favor, rellene todos los campos antes de continuar.",
+                    "Error",
+                    javax.swing.JOptionPane.ERROR_MESSAGE);
+        } else {
+            String username = usernameTextField.getText().trim();
+            String password = passwordField.getText().trim();
+            String repeatPassword = passwordRepeatField.getText().trim();
+            String role = (String) roleComboBox.getSelectedItem();
+
+            if (!repeatPassword.equals(password)) {
+                javax.swing.JOptionPane.showMessageDialog(this,
+                        "Las contraseñas no son iguales.",
+                        "Error",
+                        javax.swing.JOptionPane.ERROR_MESSAGE);
+            } else {
+                Usuario usuario = new Usuario();
+                usuario.setUsername(username);
+                usuario.setPassword(password);
+                //Switch para manejar el ROL
+                switch (role) {
+                    case "ADMINISTRADOR" ->
+                        usuario.setRol(Rol.ADMINISTRADOR);
+                    case "EMPLEADO" ->
+                        usuario.setRol(Rol.EMPLEADO);
+                }
+                try {
+                    userDAO.insertarUsuario(usuario);
+                    javax.swing.JOptionPane.showMessageDialog(this,
+                            "Usuario registrado exitosamente.",
+                            "Éxito",
+                            javax.swing.JOptionPane.INFORMATION_MESSAGE);
+
+                    // Actualizar ComboBoxes después de insertar
+                    updateUsers();
+                    limpiarCampos();
+                } catch (SQLException ex) {
+                    javax.swing.JOptionPane.showMessageDialog(this,
+                            "Error al registrar el usuario: " + ex.getMessage(),
+                            "Error",
+                            javax.swing.JOptionPane.ERROR_MESSAGE);
+                }
+
+            }
+
+        }
         updateUsers(); //Después de insertar debe actualizar el combo box
     }//GEN-LAST:event_insertButtonActionPerformed
 
     // Evento del botón ACTUALIZAR, aquí se manejarán las actualizaciones.
     private void updateButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_updateButtonActionPerformed
         // TODO add your handling code here:
-        
+        // Verificamos que se haya seleccionado un usuario para actualizar
+        String usuarioSeleccionado = (String) userComboBox.getSelectedItem();
+        if (userComboBox.getSelectedIndex() == 0) {
+            javax.swing.JOptionPane.showMessageDialog(this,
+                    "Por favor, escoge un usuario antes de actualizar.",
+                    "Error",
+                    javax.swing.JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        try {
+            // Extraer el ID del usuario del texto (formato: "ID: <id> Nombre: <nombre>")
+            int idUsuario = Integer.parseInt(usuarioSeleccionado.split(":")[1].trim().split(" ")[0]);
+            Usuario usuario = userDAO.obtenerUsuarioPorId(idUsuario); // Obtener el usuario desde el DAO
+
+            // Obtener los valores actuales del usuario
+            String usernameOriginal = usuario.getUsername();
+            String passwordOriginal = usuario.getPassword();
+            String rolOriginal = usuario.getRol().toString();
+
+            // Obtener los nuevos valores desde la UI
+            String nuevoUsername = usernameTextField.getText().trim();
+            String nuevoPassword = passwordField.getText().trim();
+            String repeatPassword = passwordRepeatField.getText().trim();
+            String nuevoRol = (String) roleComboBox.getSelectedItem();
+
+            // Validamos que la contraseña nueva coincida con la repetida
+            if (!nuevoPassword.isEmpty() && !nuevoPassword.equals(repeatPassword)) {
+                javax.swing.JOptionPane.showMessageDialog(this,
+                        "Las contraseñas no son iguales.",
+                        "Error",
+                        javax.swing.JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+            // Validar y actualizar el nombre de usuario solo si ha cambiado
+            if (!nuevoUsername.isEmpty() && !nuevoUsername.equals(usernameOriginal)) {
+                usuario.setUsername(nuevoUsername);
+            }
+
+            // Validar y actualizar la contraseña solo si ha cambiado y si se ingresó una nueva
+            if (!nuevoPassword.isEmpty() && !nuevoPassword.equals(passwordOriginal)) {
+                usuario.setPassword(nuevoPassword); // Si se ingresó nueva contraseña, la actualizamos
+            } 
+
+            // Validar y actualizar el rol solo si ha cambiado
+            if (nuevoRol != null && !nuevoRol.equals(rolOriginal)) {
+                switch (nuevoRol) {
+                    case "ADMINISTRADOR":
+                        usuario.setRol(Rol.ADMINISTRADOR);
+                        break;
+                    case "EMPLEADO":
+                        usuario.setRol(Rol.EMPLEADO);
+                        break;
+                    default:
+                        // Si no se selecciona un rol válido, no actualizamos el rol
+                        break;
+                }
+            }
+
+            // Llamar al DAO para realizar la actualización en la base de datos
+            if (userDAO.actualizarUsuario(usuario)) {
+                javax.swing.JOptionPane.showMessageDialog(this,
+                        "Usuario actualizado exitosamente.",
+                        "Éxito",
+                        javax.swing.JOptionPane.INFORMATION_MESSAGE);
+                // Actualizar ComboBox después de la actualización
+                updateUsers();
+                limpiarCampos();
+            } else {
+                javax.swing.JOptionPane.showMessageDialog(this,
+                        "No se pudo actualizar el usuario.",
+                        "Error",
+                        javax.swing.JOptionPane.ERROR_MESSAGE);
+                updateUsers();
+            }
+
+        } catch (SQLException ex) {
+            javax.swing.JOptionPane.showMessageDialog(this,
+                    "Error al actualizar el usuario: " + ex.getMessage(),
+                    "Error",
+                    javax.swing.JOptionPane.ERROR_MESSAGE);
+            updateUsers();
+        } catch (Exception ex) {  // Para otros tipos de excepciones
+            javax.swing.JOptionPane.showMessageDialog(this,
+                    "Error inesperado: " + ex.getMessage(),
+                    "Error",
+                    javax.swing.JOptionPane.ERROR_MESSAGE);
+        }
         // IMPORTANTE: Tomar ID de usuario del ComboBox
-         updateUsers(); //Después de actualizar debe actualizar el combo box
+        updateUsers(); // Después de actualizar debe actualizar el combo box
     }//GEN-LAST:event_updateButtonActionPerformed
 
     // Evento del botón ELIMINAR, aquí se manejarán los elementos eliminados.
     private void deleteButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_deleteButtonActionPerformed
-        // TODO add your handling code here:
-        
+// TODO add your handling code here:
+        String usuarioSeleccionado = (String) userComboBox.getSelectedItem();
+        if (userComboBox.getSelectedIndex() == 0) {
+            javax.swing.JOptionPane.showMessageDialog(this,
+                    "Por favor, escoge un usuario antes de eliminar.",
+                    "Error",
+                    javax.swing.JOptionPane.ERROR_MESSAGE);
+            return;
+        }
         // IMPORTANTE: Tomar ID de usuario del ComboBox
-         updateUsers(); //Después de eliminar debe actualizar el combo box
+        try {
+            // Extraer el ID del usuario del texto (formato: "ID: <id> Nombre: <nombre>")
+            int idUsuario = Integer.parseInt(usuarioSeleccionado.split(":")[1].trim().split(" ")[0]);
+
+            // Confirmar eliminación con el usuario
+            int confirmacion = javax.swing.JOptionPane.showConfirmDialog(this,
+                    "¿Está seguro de que desea eliminar este usuario?\n" + usuarioSeleccionado,
+                    "Confirmar eliminación",
+                    javax.swing.JOptionPane.YES_NO_OPTION);
+
+            if (confirmacion == javax.swing.JOptionPane.YES_OPTION) {
+                // Llamar al DAO para eliminar el empleado
+                userDAO.eliminarUsuario(idUsuario);  // Asegúrate que este método pueda lanzar SQLException
+                javax.swing.JOptionPane.showMessageDialog(this,
+                        "Empleado eliminado exitosamente.",
+                        "Éxito",
+                        javax.swing.JOptionPane.INFORMATION_MESSAGE);
+
+                // Actualizar los ComboBoxes después de eliminar
+                updateUsers();
+                limpiarCampos();
+            }
+        } catch (SQLException ex) {
+            javax.swing.JOptionPane.showMessageDialog(this,
+                    "Error al eliminar el empleado: " + ex.getMessage(),
+                    "Error",
+                    javax.swing.JOptionPane.ERROR_MESSAGE);
+        } catch (Exception ex) {  // Para otros tipos de excepciones
+            javax.swing.JOptionPane.showMessageDialog(this,
+                    "Error inesperado: " + ex.getMessage(),
+                    "Error",
+                    javax.swing.JOptionPane.ERROR_MESSAGE);
+        }
+        // IMPORTANTE: Tomar ID de empleado del ComboBox
+        updateUsers(); // Después de eliminar debe actualizar el combo box
     }//GEN-LAST:event_deleteButtonActionPerformed
 
     // Actualizar combo box de usuarios
-    private void updateUsers(){
+    private void updateUsers() {
         List<Usuario> usuarios = userDAO.obtenerUsuarios();
         userComboBox.removeAllItems();
-        
-        for(Usuario usuario: usuarios){
+        userComboBox.addItem("Selecciona un usuario para actualizar/eliminar");
+
+        for (Usuario usuario : usuarios) {
             userComboBox.addItem("ID: " + usuario.getId_usuario() + " Nombre de Usuario: " + usuario.getUsername());
         }
+    }
+
+    private void limpiarCampos() {
+        usernameTextField.setText("");
+        passwordField.setText("");
+        passwordRepeatField.setText("");
+        roleComboBox.setSelectedIndex(0);
+        userComboBox.setSelectedIndex(0);
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

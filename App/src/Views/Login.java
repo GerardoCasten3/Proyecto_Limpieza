@@ -182,23 +182,26 @@ public class Login extends javax.swing.JFrame {
             valido = userDAO.iniciarSesion(user, password);
             admin = userDAO.esAdmin();
             Usuario usuario = sesion.getUsuarioActivo();
-            Empleado empleado = empDAO.obtenerEmpleadoPorIdUsuario(usuario.getId_usuario());
-            
-            if (valido && admin) { // Verificar si está registrado y es administrador
-                this.setVisible(false);
-                MenuAdmin contenido = new MenuAdmin();
-                contenido.setVisible(true);
-            } else if(valido && !admin && empleado.isEsJefeCuadrilla()){ // Verificar si está registrado, no es administrador y es jefe de cuadrilla
-                this.setVisible(false);
-                MenuChief contenido =new MenuChief();
-                contenido.setVisible(true);
-            
-            }else if(valido && !admin && !empleado.isEsJefeCuadrilla()){ // Verificar si está registrado, no es administrador y es jefe de cuadrilla
-                this.setVisible(false);
-                MenuUser contenido =new MenuUser();
-                contenido.setVisible(true);
-            
-            }else {
+
+            if (valido) {
+                Empleado empleado = empDAO.obtenerEmpleadoPorIdUsuario(usuario.getId_usuario());
+
+                if (admin) { // Si es administrador
+                    this.setVisible(false);
+                    MenuAdmin contenido = new MenuAdmin();
+                    contenido.setVisible(true);
+                } else { // Si no es administrador
+                    if (empleado.isEsJefeCuadrilla()) { // Si es jefe de cuadrilla
+                        this.setVisible(false);
+                        MenuChief contenido = new MenuChief();
+                        contenido.setVisible(true);
+                    } else { // Si no es jefe de cuadrilla
+                        this.setVisible(false);
+                        MenuUser contenido = new MenuUser();
+                        contenido.setVisible(true);
+                    }
+                }
+            } else {
                 JOptionPane.showMessageDialog(null, "¡Las credenciales no son correctas!", "Credenciales Incorrectas", JOptionPane.ERROR_MESSAGE);
                 limpiarCampos();
                 return;

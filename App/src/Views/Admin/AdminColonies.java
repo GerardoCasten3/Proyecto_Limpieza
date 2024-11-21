@@ -7,13 +7,14 @@ package Views.Admin;
 import Models.*;
 import Controller.*;
 import java.util.List;
-
+import java.sql.*;
 
 /**
  *
  * @author gerar
  */
 public class AdminColonies extends javax.swing.JPanel {
+
     ColoniasDAO colonyDAO = new ColoniasDAO();
 
     /**
@@ -38,7 +39,6 @@ public class AdminColonies extends javax.swing.JPanel {
         zipLabel = new javax.swing.JLabel();
         settlementLabel = new javax.swing.JLabel();
         nameTextField = new javax.swing.JTextField();
-        zipField = new javax.swing.JPasswordField();
         roleComboBox = new javax.swing.JComboBox<>();
         insertButton = new javax.swing.JButton();
         colonyLabel = new javax.swing.JLabel();
@@ -47,6 +47,7 @@ public class AdminColonies extends javax.swing.JPanel {
         deleteButton = new javax.swing.JButton();
         jPanel1 = new javax.swing.JPanel();
         jLabel2 = new javax.swing.JLabel();
+        zipField = new javax.swing.JTextField();
 
         title1.setFont(new java.awt.Font("Bahnschrift", 1, 28)); // NOI18N
         title1.setText("ADMINISTRAR COLONIAS");
@@ -62,9 +63,6 @@ public class AdminColonies extends javax.swing.JPanel {
 
         nameTextField.setFont(new java.awt.Font("Poppins SemiBold", 0, 12)); // NOI18N
         nameTextField.setToolTipText("Ingresa el nombre de la colonia a agregar");
-
-        zipField.setFont(new java.awt.Font("Poppins Medium", 0, 12)); // NOI18N
-        zipField.setToolTipText("Ingresa el código postal de la colonia");
 
         roleComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Escoge el tipo de asentamiento:", "Barrio", "Colonia", "Ejido", "Equipamiento", "Exhacienda", "Fraccionamiento", "Paraje", "Ranchería", "Rancho", "Unidad habitacional", "Zona industrial", "Zona militar" }));
         roleComboBox.setToolTipText("Escoge el tipo de asentamiento asignado para la colonia");
@@ -126,8 +124,10 @@ public class AdminColonies extends javax.swing.JPanel {
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addGap(64, 64, 64)
                 .addComponent(jLabel2)
-                .addContainerGap(41, Short.MAX_VALUE))
+                .addContainerGap(42, Short.MAX_VALUE))
         );
+
+        zipField.setFont(new java.awt.Font("Poppins SemiBold", 0, 12)); // NOI18N
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -145,9 +145,11 @@ public class AdminColonies extends javax.swing.JPanel {
                             .addComponent(zipLabel)
                             .addComponent(nameLabel))
                         .addGap(45, 45, 45)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(zipField, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 232, Short.MAX_VALUE)
-                            .addComponent(nameTextField, javax.swing.GroupLayout.Alignment.TRAILING))
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(nameTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 232, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addGroup(layout.createSequentialGroup()
+                                .addGap(17, 17, 17)
+                                .addComponent(zipField, javax.swing.GroupLayout.PREFERRED_SIZE, 194, javax.swing.GroupLayout.PREFERRED_SIZE)))
                         .addGap(376, 376, 376))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                         .addComponent(insertButton)
@@ -196,40 +198,210 @@ public class AdminColonies extends javax.swing.JPanel {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(deleteButton)
                     .addComponent(updateButton))
-                .addContainerGap(184, Short.MAX_VALUE))
+                .addContainerGap(183, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
     // Evento del botón AGREGAR, aquí se manejarán las inserciones.
     private void insertButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_insertButtonActionPerformed
         // TODO add your handling code here:
+        // TODO add your handling code here:
+        if (nameTextField.getText().trim().isEmpty()
+                || zipField.getText().trim().isEmpty()
+                || roleComboBox.getSelectedIndex() == 0) {
+
+            // Mostrar mensaje de error si faltan campos
+            javax.swing.JOptionPane.showMessageDialog(this,
+                    "Por favor, rellene todos los campos antes de continuar.",
+                    "Error",
+                    javax.swing.JOptionPane.ERROR_MESSAGE);
+        } else {
+            // Aquí iría la lógica para insertar el empleado
+            String nombre = nameTextField.getText().trim();
+            int codigoPostal;
+            try {
+                codigoPostal = Integer.parseInt(zipField.getText().trim());
+            } catch (NumberFormatException e) {
+                javax.swing.JOptionPane.showMessageDialog(this,
+                        "El código postal debe ser un número válido.",
+                        "Error",
+                        javax.swing.JOptionPane.ERROR_MESSAGE);
+                return; // Salir del método si el código postal no es válido
+            }
+            String tipoAsentamiento = (String) roleComboBox.getSelectedItem();
+
+            // Crear la colonia
+            Colonia nuevaColonia = new Colonia();
+            nuevaColonia.setNombre(nombre);
+            nuevaColonia.setCodigoPostal(codigoPostal);
+            nuevaColonia.setTipoAsentamiento(tipoAsentamiento);
+
+            // Llamar al DAO para insertar la colonia
+            try {
+                colonyDAO.agregarColonia(nuevaColonia);
+                javax.swing.JOptionPane.showMessageDialog(this,
+                        "Colonia registrada exitosamente.",
+                        "Éxito",
+                        javax.swing.JOptionPane.INFORMATION_MESSAGE);
+
+                // Actualizar ComboBoxes después de insertar
+                updateColonies();
+                limpiarCampos();
+            } catch (Exception ex) {
+                javax.swing.JOptionPane.showMessageDialog(this,
+                        "Error al registrar la colonia: " + ex.getMessage(),
+                        "Error",
+                        javax.swing.JOptionPane.ERROR_MESSAGE);
+            }
+        }
         updateColonies(); //Después de insertar debe actualizar el combo box
+        limpiarCampos();
     }//GEN-LAST:event_insertButtonActionPerformed
 
     // Evento del botón ACTUALIZAR, aquí se manejarán las actualizaciones.
     private void updateButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_updateButtonActionPerformed
         // TODO add your handling code here:
-        
+// Obtener la colonia seleccionada del ComboBox
+        String coloniaSeleccionada = (String) colonyComboBox.getSelectedItem();
+
+        if (colonyComboBox.getSelectedIndex() == 0) {
+            javax.swing.JOptionPane.showMessageDialog(this,
+                    "Por favor, escoge una colonia antes de actualizar.",
+                    "Error",
+                    javax.swing.JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        try {
+            // Extraer el ID de la colonia del texto (formato: "ID: <id> Nombre: <nombre>")
+            int idColonia = Integer.parseInt(coloniaSeleccionada.split(":")[1].trim().split(" ")[0]);
+            Colonia colonia = colonyDAO.obtenerColoniaPorId(idColonia);  // Obtener la colonia desde el DAO
+
+            // Obtener los valores actuales de la colonia
+            String nombreOriginal = colonia.getNombre();
+            int codigoPostalOriginal = colonia.getCodigoPostal();
+            String tipoAsentamientoOriginal = colonia.getTipoAsentamiento();
+
+            // Obtener los nuevos valores desde la UI
+            String nuevoNombre = nameTextField.getText().trim();
+            String tipoAsentamiento = (String) roleComboBox.getSelectedItem();
+            String nuevoCodigoPostalStr = zipField.getText().trim();
+
+            // Validar y actualizar el nombre solo si ha cambiado
+            if (!nuevoNombre.isEmpty() && !nuevoNombre.equals(nombreOriginal)) {
+                colonia.setNombre(nuevoNombre);
+            }
+
+            // Validar y actualizar el código postal solo si se ha ingresado un valor
+            if (!nuevoCodigoPostalStr.isEmpty()) {
+                try {
+                    int nuevoCodigoPostal = Integer.parseInt(nuevoCodigoPostalStr);
+                    if (nuevoCodigoPostal != codigoPostalOriginal) {
+                        colonia.setCodigoPostal(nuevoCodigoPostal);
+                    }
+                } catch (NumberFormatException e) {
+                    javax.swing.JOptionPane.showMessageDialog(this,
+                            "El código postal debe ser un número válido.",
+                            "Error",
+                            javax.swing.JOptionPane.ERROR_MESSAGE);
+                    return; // Salir del método si el código postal no es válido
+                }
+            }
+
+            // Validar y actualizar el tipo de asentamiento solo si ha cambiado
+            if (roleComboBox.getSelectedIndex() != 0 && !tipoAsentamiento.equals(tipoAsentamientoOriginal)) {
+                colonia.setTipoAsentamiento(tipoAsentamiento);
+            }
+
+            // Llamar al DAO para realizar la actualización en la base de datos
+            if (colonyDAO.actualizarColonia(colonia, idColonia)) {
+                javax.swing.JOptionPane.showMessageDialog(this,
+                        "Colonia actualizada exitosamente.",
+                        "Éxito",
+                        javax.swing.JOptionPane.INFORMATION_MESSAGE);
+                // Actualizar ComboBox después de la actualización
+                updateColonies();
+                limpiarCampos();
+            } else {
+                javax.swing.JOptionPane.showMessageDialog(this,
+                        "No se pudo actualizar la colonia.",
+                        "Error",
+                        javax.swing.JOptionPane.ERROR_MESSAGE);
+            }
+
+        } catch (SQLException ex) {
+            javax.swing.JOptionPane.showMessageDialog(this,
+                    "Error al actualizar la colonia: " + ex.getMessage(),
+                    "Error",
+                    javax.swing.JOptionPane.ERROR_MESSAGE);
+        }
         // IMPORTANTE: Tomar ID de colonia del ComboBox
-         updateColonies(); //Después de actualizar debe actualizar el combo box
+        limpiarCampos();
+        updateColonies(); //Después de actualizar debe actualizar el combo box
     }//GEN-LAST:event_updateButtonActionPerformed
 
     // Evento del botón ELIMINAR, aquí se manejarán los elementos eliminados.
     private void deleteButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_deleteButtonActionPerformed
         // TODO add your handling code here:
-        
+// TODO add your handling code here:
+        String coloniaSeleccionada = (String) colonyComboBox.getSelectedItem();
+        if (colonyComboBox.getSelectedIndex() == 0) {
+            javax.swing.JOptionPane.showMessageDialog(this,
+                    "Por favor, escoge una colonia antes de actualizar.",
+                    "Error",
+                    javax.swing.JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        try {
+            // Extraer el ID de la colonia del texto (formato: "ID: <id> Colonia: <nombre>")
+            int idColonia = Integer.parseInt(coloniaSeleccionada.split(":")[1].trim().split(" ")[0]);
+
+            // Confirmar eliminación con el usuario
+            int confirmacion = javax.swing.JOptionPane.showConfirmDialog(this,
+                    "¿Está seguro de que desea eliminar esta colonia?\n" + coloniaSeleccionada,
+                    "Confirmar eliminación",
+                    javax.swing.JOptionPane.YES_NO_OPTION);
+
+            if (confirmacion == javax.swing.JOptionPane.YES_OPTION) {
+                // Llamar al DAO para eliminar la colonia
+                colonyDAO.eliminarColonia(idColonia);
+                javax.swing.JOptionPane.showMessageDialog(this,
+                        "Colonia eliminada exitosamente.",
+                        "Éxito",
+                        javax.swing.JOptionPane.INFORMATION_MESSAGE);
+
+                // Actualizar los ComboBoxes y tabla
+                limpiarCampos();
+                updateColonies();
+            }
+        } catch (Exception ex) {
+            javax.swing.JOptionPane.showMessageDialog(this,
+                    "Error al eliminar la colonia: " + ex.getMessage(),
+                    "Error",
+                    javax.swing.JOptionPane.ERROR_MESSAGE);
+        }
         // IMPORTANTE: Tomar ID de colonia del ComboBox
-         updateColonies(); //Después de eliminar debe actualizar el combo box
+        limpiarCampos();
+        updateColonies(); //Después de eliminar debe actualizar el combo box
     }//GEN-LAST:event_deleteButtonActionPerformed
 
     // Actualizar combo box de usuarios
-    private void updateColonies(){
+    private void updateColonies() {
         List<Colonia> colonies = colonyDAO.obtenerTodasLasColonias();
         colonyComboBox.removeAllItems();
-        
-        for(Colonia colony: colonies){
+        colonyComboBox.addItem("Escoge la colonia:");
+
+        for (Colonia colony : colonies) {
             colonyComboBox.addItem("ID: " + colony.getId_colonia() + " Colonia: " + colony.getNombre());
         }
+    }
+    
+    private void limpiarCampos(){
+        nameTextField.setText("");
+        zipField.setText("");
+        roleComboBox.setSelectedIndex(0);
+        
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -245,7 +417,7 @@ public class AdminColonies extends javax.swing.JPanel {
     private javax.swing.JLabel settlementLabel;
     private javax.swing.JLabel title1;
     private javax.swing.JButton updateButton;
-    private javax.swing.JPasswordField zipField;
+    private javax.swing.JTextField zipField;
     private javax.swing.JLabel zipLabel;
     // End of variables declaration//GEN-END:variables
 }

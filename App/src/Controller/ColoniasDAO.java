@@ -28,7 +28,7 @@ public class ColoniasDAO {
     }
 
     // Método para actualizar una colonia
-    public void actualizarColonia(Colonia colonia, int id_colonia) {
+    public boolean actualizarColonia(Colonia colonia, int id_colonia) throws SQLException {
         String sql = "UPDATE colonias SET nombre = ?, codigo_postal = ?, tipo_asentamiento = ? WHERE id_colonia = ?";
         try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
             pstmt.setString(1, colonia.getNombre());
@@ -36,10 +36,10 @@ public class ColoniasDAO {
             pstmt.setString(3, colonia.getTipoAsentamiento());
             pstmt.setInt(4, id_colonia);
             pstmt.executeUpdate();
-        } catch (SQLException e) {
-            System.err.println("Error al actualizar colonia: " + e.getMessage());
+            return pstmt.executeUpdate() > 0;
         }
     }
+        
 
     // Método para eliminar una colonia
     public void eliminarColonia(int id_colonia) {

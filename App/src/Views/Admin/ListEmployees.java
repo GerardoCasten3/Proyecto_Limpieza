@@ -8,13 +8,14 @@ import Models.Empleado;
 import Controller.EmpleadoDAO;
 import java.util.List;
 import javax.swing.table.DefaultTableModel;
+
 /**
  *
  * @author gerar
  */
 public class ListEmployees extends javax.swing.JPanel {
+
     EmpleadoDAO employeeD = new EmpleadoDAO();
-    
 
     /**
      * Creates new form ListUsers
@@ -89,20 +90,25 @@ public class ListEmployees extends javax.swing.JPanel {
         );
     }// </editor-fold>//GEN-END:initComponents
 
-    private void showEmployees(){
+    private void showEmployees() {
         List<Empleado> employees = employeeD.obtenerEmpleados();
         DefaultTableModel model = (DefaultTableModel) usersTable.getModel();
         model.setRowCount(0);
+
         for (Empleado empleado : employees) {
-           Object[] row = {
-               empleado.getId_empleado(),
-               empleado.getNombre(),
-               empleado.getCargo(),
-               empleado.isEsJefeCuadrilla(),
-               empleado.getCuadrilla().getNombre(),
-               empleado.getUsuario().getUsername()
-           };
-           model.addRow(row);
+            // Verificar si el usuario es nulo antes de intentar acceder a getUsername()
+            String username = (empleado.getUsuario() != null) ? empleado.getUsuario().getUsername() : "No tiene usuario";
+
+            Object[] row = {
+                empleado.getId_empleado(),
+                empleado.getNombre(),
+                empleado.getCargo(),
+                empleado.isEsJefeCuadrilla(),
+                empleado.getCuadrilla().getNombre(),
+                username // Mostrar "No tiene usuario" si el usuario es nulo
+            };
+
+            model.addRow(row);
         }
     }
 
