@@ -116,6 +116,7 @@ public class ActividadLimpieza {
             observer.actualizar(mensaje);
         }
     }
+    
 
     @Override
     public String toString() {

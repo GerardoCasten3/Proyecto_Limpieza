@@ -296,8 +296,9 @@ public class ActivitiesChief extends javax.swing.JPanel {
             // Aquí puedes implementar la lógica de guardado, como actualizar la base de datos.
             int id_actividad = getSelectedActivityId();
             String retroalimentacion = retroTextArea.getText();
-            boolean checked = completedCheckBox.isSelected();           
-            actDAO.actualizarRetroalimentacionImagen(retroalimentacion, rutaEvidencia, checked, id_actividad);
+            boolean checked = completedCheckBox.isSelected();   
+            Usuario usuario = Sesion.getInstance().getUsuarioActivo();
+            actDAO.actualizarRetroalimentacionImagen(retroalimentacion, rutaEvidencia, checked, id_actividad, usuario.getId_usuario());
             updateInfo();
                     
             JOptionPane.showMessageDialog(this, "La actividad se ha guardado correctamente.", "Éxito", JOptionPane.INFORMATION_MESSAGE);

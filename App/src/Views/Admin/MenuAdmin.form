@@ -23,10 +23,18 @@
           <SubComponents>
             <MenuItem class="javax.swing.JMenuItem" name="topMenuItem">
               <Properties>
-                <Property name="text" type="java.lang.String" value="Inicio/Dashboard"/>
+                <Property name="text" type="java.lang.String" value="Inicio"/>
               </Properties>
               <Events>
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="topMenuItemActionPerformed"/>
+              </Events>
+            </MenuItem>
+            <MenuItem class="javax.swing.JMenuItem" name="dashboardItem">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Dashboard"/>
+              </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="dashboardItemActionPerformed"/>
               </Events>
             </MenuItem>
           </SubComponents>

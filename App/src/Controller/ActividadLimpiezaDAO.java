@@ -59,7 +59,7 @@ public class ActividadLimpiezaDAO {
     }
 
     // Método para actualizar retroalimentación e imagen
-    public void actualizarRetroalimentacionImagen(String retroalimentacion, String imagen, boolean completado, int id) {
+    public void actualizarRetroalimentacionImagen(String retroalimentacion, String imagen, boolean completado, int id, int idUsuario) {
         String sql = "UPDATE actividades_limpieza SET retroalimentacion = ?, imagenEvidencia = ?, completado = ? WHERE id_actividad = ?";
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setString(1, retroalimentacion);
@@ -69,7 +69,14 @@ public class ActividadLimpiezaDAO {
             stmt.executeUpdate();
 
             ActividadLimpieza actividad = buscarActividadPorId(id);
-            actividad.notificarObserver("Se actualizó la retroalimentación, la imagen y el estatus de la actividad con ID: " + id);
+            String mensaje = "Se actualizó la retroalimentación, la imagen y el estatus de la actividad con ID: " + id;
+            
+            NotificacionObserver observer = new NotificacionObserver(idUsuario);
+            actividad.agregarObserver(observer);
+            
+            actividad.notificarObserver(mensaje);
+            
+            guardarNotificacion(idUsuario, id, mensaje);
         } catch (SQLException e) {
             System.err.println("Error al actualizar retroalimentación e imagen: " + e.getMessage());
         }
@@ -200,24 +207,58 @@ public class ActividadLimpiezaDAO {
 
         return actividades;
     }
-    
+
     public List<Object[]> obtenerResumenPorCuadrilla() throws SQLException {
-    List<Object[]> resumen = new ArrayList<>();
-    String query = "SELECT c.nombre, "
-                 + "COUNT(CASE WHEN a.completado = TRUE THEN 1 END) AS actividades_completadas, "
-                 + "COUNT(CASE WHEN a.completado = FALSE THEN 1 END) AS actividades_no_completadas "
-                 + "FROM cuadrillas c "
-                 + "LEFT JOIN actividades_limpieza a ON c.id_cuadrilla = a.id_cuadrilla "
-                 + "GROUP BY c.id_cuadrilla";
-    try (PreparedStatement ps = connection.prepareStatement(query);
-         ResultSet rs = ps.executeQuery()) {
-        while (rs.next()) {
-            String nombreCuadrilla = rs.getString("nombre");
-            int actividadesCompletadas = rs.getInt("actividades_completadas");
-            int actividadesNoCompletadas = rs.getInt("actividades_no_completadas");
-            resumen.add(new Object[]{nombreCuadrilla, actividadesCompletadas, actividadesNoCompletadas});
+        List<Object[]> resumen = new ArrayList<>();
+        String query = "SELECT c.nombre, "
+                + "COUNT(CASE WHEN a.completado = TRUE THEN 1 END) AS actividades_completadas, "
+                + "COUNT(CASE WHEN a.completado = FALSE THEN 1 END) AS actividades_no_completadas "
+                + "FROM cuadrillas c "
+                + "LEFT JOIN actividades_limpieza a ON c.id_cuadrilla = a.id_cuadrilla "
+                + "GROUP BY c.id_cuadrilla";
+        try (PreparedStatement ps = connection.prepareStatement(query); ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) {
+                String nombreCuadrilla = rs.getString("nombre");
+                int actividadesCompletadas = rs.getInt("actividades_completadas");
+                int actividadesNoCompletadas = rs.getInt("actividades_no_completadas");
+                resumen.add(new Object[]{nombreCuadrilla, actividadesCompletadas, actividadesNoCompletadas});
+            }
+        }
+        return resumen;
+    }
+
+    public void guardarNotificacion(int idUsuario, int idActividad, String mensaje) {
+        String sql = "INSERT INTO observadores (id_usuario, id_actividad, mensaje) VALUES (?, ?, ?)";
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setInt(1, idUsuario);
+            stmt.setInt(2, idActividad);
+            stmt.setString(3, mensaje);
+            stmt.executeUpdate();
+        } catch (SQLException e) {
         }
     }
-    return resumen;
-}
+
+    public List<String> obtenerNotificaciones() {
+        List<String> notificaciones = new ArrayList<>();
+        String sql = "SELECT u.username, o.id_actividad, o.mensaje FROM observadores o "
+                + "JOIN usuarios u ON o.id_usuario = u.id_usuario "
+                + "ORDER BY o.id_observador DESC";
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    String nombreUsuario = rs.getString("username");
+                    int idActividad = rs.getInt("id_actividad");
+                    String mensaje = rs.getString("mensaje");
+                    // Construye el mensaje con el nombre del usuario
+                    String notificacion = "Notificación del usuario \"" + nombreUsuario + "\" en actividad \""
+                            + idActividad + "\" : \"" + mensaje + "\"";
+                    notificaciones.add(notificacion);
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("Error al obtener notificaciones: " + e.getMessage());
+        }
+        return notificaciones;
+    }
+
 }

@@ -5,31 +5,41 @@
 package Views.Admin;
 
 import Controller.*;
-import Models.Usuario;
-import java.awt.BorderLayout;
+import Models.*;
 import java.util.List;
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
-import java.sql.*;
 
 /**
  *
  * @author gerar
  */
-public class Dashboard extends javax.swing.JPanel {
+public class Inicio extends javax.swing.JPanel {
 
     Sesion sesion = Sesion.getInstance();
-    ActividadLimpiezaDAO actDAO = new ActividadLimpiezaDAO();
-    
+    ActividadLimpiezaDAO act = new ActividadLimpiezaDAO();
 
     /**
      * Creates new form Dashboard
      */
-    public Dashboard() {
+    public Inicio() {
         initComponents();
         Usuario usuario = sesion.getUsuarioActivo();
         titleLabel.setText("BIENVENIDO DE NUEVO, " + usuario.getUsername());
-        mostrarResumenCuadrillas();
+
+        // Obtener la lista de notificaciones
+        List<String> notificaciones = act.obtenerNotificaciones();
+
+        // Iterar sobre cada notificación y agregarla al área de texto
+        for (String notificacion : notificaciones) {
+            agregarNotificacion(notificacion);
+        }
+
+    }
+
+    public void agregarNotificacion(String mensaje) {
+        // Agrega el mensaje al JTextArea con un salto de línea
+        notificationArea.append(mensaje + "\n");
+        // Desplaza automáticamente al final para mostrar el mensaje más reciente
+        notificationArea.setCaretPosition(notificationArea.getDocument().getLength());
     }
 
     /**
@@ -48,8 +58,7 @@ public class Dashboard extends javax.swing.JPanel {
         jPanel2 = new javax.swing.JPanel();
         jLabel2 = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
-        jTable1 = new javax.swing.JTable();
-        dashboardPanel = new javax.swing.JPanel();
+        notificationArea = new javax.swing.JTextArea();
 
         jPanel1.setBackground(new java.awt.Color(33, 58, 87));
 
@@ -94,37 +103,15 @@ public class Dashboard extends javax.swing.JPanel {
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel2Layout.createSequentialGroup()
-                .addGap(64, 64, 64)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
+                .addContainerGap(63, Short.MAX_VALUE)
                 .addComponent(jLabel2)
-                .addContainerGap(32, Short.MAX_VALUE))
+                .addGap(42, 42, 42))
         );
 
-        jTable1.setModel(new javax.swing.table.DefaultTableModel(
-            new Object [][] {
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null}
-            },
-            new String [] {
-                "Title 1", "Title 2", "Title 3", "Title 4"
-            }
-        ));
-        jScrollPane1.setViewportView(jTable1);
-
-        dashboardPanel.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
-
-        javax.swing.GroupLayout dashboardPanelLayout = new javax.swing.GroupLayout(dashboardPanel);
-        dashboardPanel.setLayout(dashboardPanelLayout);
-        dashboardPanelLayout.setHorizontalGroup(
-            dashboardPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 1096, Short.MAX_VALUE)
-        );
-        dashboardPanelLayout.setVerticalGroup(
-            dashboardPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 258, Short.MAX_VALUE)
-        );
+        notificationArea.setColumns(20);
+        notificationArea.setRows(5);
+        jScrollPane1.setViewportView(notificationArea);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -141,78 +128,31 @@ public class Dashboard extends javax.swing.JPanel {
                         .addComponent(subtitleLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 931, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(94, 94, 94))))
             .addGroup(layout.createSequentialGroup()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(148, 148, 148)
-                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 903, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(52, 52, 52)
-                        .addComponent(dashboardPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addGap(167, 167, 167)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 870, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(0, 0, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addGap(19, 19, 19)
+                .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(47, 47, 47)
                 .addComponent(titleLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 48, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(subtitleLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 64, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 111, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(81, 81, 81)
-                .addComponent(dashboardPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(36, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 330, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(128, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
-    private void mostrarResumenCuadrillas() {
-        // Limpiar cualquier dato anterior en el panel
-        dashboardPanel.removeAll();
-        dashboardPanel.revalidate();
-        dashboardPanel.repaint();
-
-        try {
-            List<Object[]> resumen = actDAO.obtenerResumenPorCuadrilla();
-
-            // Crear un panel o un componente para mostrar los resultados (tabla)
-            String[] columnNames = {"Cuadrilla", "Actividades Completadas", "Actividades No Completadas"};
-            Object[][] data = new Object[resumen.size()][3];
-
-            for (int i = 0; i < resumen.size(); i++) {
-                data[i][0] = resumen.get(i)[0];  // Nombre de la cuadrilla
-                data[i][1] = resumen.get(i)[1];  // Actividades completadas
-                data[i][2] = resumen.get(i)[2];  // Actividades no completadas
-            }
-
-            JTable table = new JTable(data, columnNames);
-            table.setFillsViewportHeight(true);
-
-            // Agregar la tabla al panel
-            JScrollPane scrollPane = new JScrollPane(table);
-            dashboardPanel.setLayout(new BorderLayout());
-            dashboardPanel.add(scrollPane, BorderLayout.CENTER);
-
-            // Actualizar el panel para reflejar los cambios
-            dashboardPanel.revalidate();
-            dashboardPanel.repaint();
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-            javax.swing.JOptionPane.showMessageDialog(this,
-                    "Error al obtener los datos de las cuadrillas: " + e.getMessage(),
-                    "Error", javax.swing.JOptionPane.ERROR_MESSAGE);
-        }
-    }
-
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JPanel dashboardPanel;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JTable jTable1;
+    private javax.swing.JTextArea notificationArea;
     private javax.swing.JLabel subtitleLabel2;
     private javax.swing.JLabel titleLabel;
     // End of variables declaration//GEN-END:variables

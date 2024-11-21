@@ -25,7 +25,7 @@ public class MenuAdmin extends javax.swing.JFrame {
     public MenuAdmin() {
         if (sesion.estaAutenticado()) {
             initComponents();
-            Dashboard top = new Dashboard();
+            Inicio top = new Inicio();
             showPanel(top);
         }
         else{
@@ -49,6 +49,7 @@ public class MenuAdmin extends javax.swing.JFrame {
         jMenuBar1 = new javax.swing.JMenuBar();
         topMenu = new javax.swing.JMenu();
         topMenuItem = new javax.swing.JMenuItem();
+        dashboardItem = new javax.swing.JMenuItem();
         userMenu = new javax.swing.JMenu();
         adminUsersItem = new javax.swing.JMenuItem();
         listUsersItem = new javax.swing.JMenuItem();
@@ -90,13 +91,21 @@ public class MenuAdmin extends javax.swing.JFrame {
         topMenu.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Icons/top.png"))); // NOI18N
         topMenu.setText("Inicio");
 
-        topMenuItem.setText("Inicio/Dashboard");
+        topMenuItem.setText("Inicio");
         topMenuItem.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 topMenuItemActionPerformed(evt);
             }
         });
         topMenu.add(topMenuItem);
+
+        dashboardItem.setText("Dashboard");
+        dashboardItem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                dashboardItemActionPerformed(evt);
+            }
+        });
+        topMenu.add(dashboardItem);
 
         jMenuBar1.add(topMenu);
 
@@ -274,7 +283,7 @@ public class MenuAdmin extends javax.swing.JFrame {
 
     private void topMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_topMenuItemActionPerformed
         // TODO add your handling code here:
-        Dashboard top = new Dashboard();
+        Inicio top = new Inicio();
         showPanel(top);
     }//GEN-LAST:event_topMenuItemActionPerformed
 
@@ -338,6 +347,12 @@ public class MenuAdmin extends javax.swing.JFrame {
         showPanel(admAPanel);
     }//GEN-LAST:event_adminActivitiesItemActionPerformed
 
+    private void dashboardItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_dashboardItemActionPerformed
+        // TODO add your handling code here:
+        DashboardF dashPanel = new DashboardF();
+        showPanel(dashPanel);
+    }//GEN-LAST:event_dashboardItemActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -387,6 +402,7 @@ public class MenuAdmin extends javax.swing.JFrame {
     private javax.swing.JMenuItem adminUsersItem;
     private javax.swing.JMenuItem closeSessionItem;
     private javax.swing.JMenu colonyMenu;
+    private javax.swing.JMenuItem dashboardItem;
     private javax.swing.JMenu employeesMenu;
     private javax.swing.JButton jButton1;
     private javax.swing.JMenu jMenu1;
