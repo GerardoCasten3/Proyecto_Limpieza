@@ -99,11 +99,11 @@ public class Login extends javax.swing.JFrame {
             .addGroup(layout.createSequentialGroup()
                 .addGap(481, 481, 481)
                 .addComponent(loginButton, javax.swing.GroupLayout.PREFERRED_SIZE, 158, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(459, Short.MAX_VALUE))
+                .addContainerGap(460, Short.MAX_VALUE))
             .addGroup(layout.createSequentialGroup()
                 .addGap(233, 233, 233)
                 .addComponent(title1)
-                .addContainerGap(247, Short.MAX_VALUE))
+                .addContainerGap(248, Short.MAX_VALUE))
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addGap(0, 0, Short.MAX_VALUE)
                 .addComponent(subtitle1)
@@ -195,7 +195,7 @@ public class Login extends javax.swing.JFrame {
                         this.setVisible(false);
                         MenuChief contenido = new MenuChief();
                         contenido.setVisible(true);
-                    } else { // Si no es jefe de cuadrilla
+                    } else if(!empleado.isEsJefeCuadrilla()){ // Si no es jefe de cuadrilla
                         this.setVisible(false);
                         MenuUser contenido = new MenuUser();
                         contenido.setVisible(true);

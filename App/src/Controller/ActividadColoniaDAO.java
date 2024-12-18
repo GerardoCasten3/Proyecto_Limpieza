@@ -1,6 +1,6 @@
 package Controller;
 
-import DB.DBConfig;
+import Models.DBConfig;
 import Models.ActividadColonia;
 import Models.Colonia;
 import Models.ActividadLimpieza;

@@ -3,7 +3,7 @@ package Controller;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
-import DB.DBConfig;
+import Models.DBConfig;
 import Models.Cuadrilla;
 
 public class CuadrillaDAO {

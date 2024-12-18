@@ -99,12 +99,16 @@ public class ListEmployees extends javax.swing.JPanel {
             // Verificar si el usuario es nulo antes de intentar acceder a getUsername()
             String username = (empleado.getUsuario() != null) ? empleado.getUsuario().getUsername() : "No tiene usuario";
 
+            // Verificar si la cuadrilla es nula antes de intentar acceder a getNombre() y getIdCuadrilla()
+            String nombreCuadrilla = (empleado.getCuadrilla() != null) ? empleado.getCuadrilla().getNombre() : "Sin cuadrilla";
+            int idCuadrilla = (empleado.getCuadrilla() != null) ? empleado.getCuadrilla().getId_cuadrilla() : -1; // Usar -1 como valor por defecto si la cuadrilla es nula
+
             Object[] row = {
                 empleado.getId_empleado(),
                 empleado.getNombre(),
                 empleado.getCargo(),
                 empleado.isEsJefeCuadrilla(),
-                empleado.getCuadrilla().getNombre(),
+                nombreCuadrilla, // Mostrar "Sin cuadrilla" si la cuadrilla es nula
                 username // Mostrar "No tiene usuario" si el usuario es nulo
             };
 

@@ -7,6 +7,7 @@ package Views.Admin;
 import Controller.*;
 import Models.*;
 import java.util.List;
+import javax.swing.JOptionPane;
 
 /**
  *
@@ -59,6 +60,7 @@ public class Inicio extends javax.swing.JPanel {
         jLabel2 = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
         notificationArea = new javax.swing.JTextArea();
+        readNotifications = new javax.swing.JButton();
 
         jPanel1.setBackground(new java.awt.Color(33, 58, 87));
 
@@ -113,6 +115,15 @@ public class Inicio extends javax.swing.JPanel {
         notificationArea.setRows(5);
         jScrollPane1.setViewportView(notificationArea);
 
+        readNotifications.setBackground(new java.awt.Color(0, 102, 102));
+        readNotifications.setFont(new java.awt.Font("Poppins SemiBold", 0, 12)); // NOI18N
+        readNotifications.setText("Leer Notificaciones");
+        readNotifications.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                readNotificationsActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -128,8 +139,13 @@ public class Inicio extends javax.swing.JPanel {
                         .addComponent(subtitleLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 931, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(94, 94, 94))))
             .addGroup(layout.createSequentialGroup()
-                .addGap(167, 167, 167)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 870, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(167, 167, 167)
+                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 870, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(518, 518, 518)
+                        .addComponent(readNotifications)))
                 .addGap(0, 0, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
@@ -142,9 +158,17 @@ public class Inicio extends javax.swing.JPanel {
                 .addComponent(subtitleLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 64, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 330, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(128, Short.MAX_VALUE))
+                .addGap(39, 39, 39)
+                .addComponent(readNotifications)
+                .addContainerGap(59, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
+
+    private void readNotificationsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_readNotificationsActionPerformed
+        // TODO add your handling code here:
+        act.leerNotificaciones();
+        JOptionPane.showMessageDialog(null, "Se han marcado como leídas todas las notificaciones.");
+    }//GEN-LAST:event_readNotificationsActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel jLabel1;
@@ -153,6 +177,7 @@ public class Inicio extends javax.swing.JPanel {
     private javax.swing.JPanel jPanel2;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTextArea notificationArea;
+    private javax.swing.JButton readNotifications;
     private javax.swing.JLabel subtitleLabel2;
     private javax.swing.JLabel titleLabel;
     // End of variables declaration//GEN-END:variables

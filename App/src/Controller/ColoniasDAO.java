@@ -1,6 +1,6 @@
 package Controller;
 
-import DB.DBConfig;
+import Models.DBConfig;
 import Models.Colonia;
 import java.sql.*;
 import java.util.ArrayList;

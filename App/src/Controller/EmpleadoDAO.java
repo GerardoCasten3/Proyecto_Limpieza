@@ -8,7 +8,7 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import DB.DBConfig;
+import Models.DBConfig;
 import Models.Empleado;
 import Models.Cuadrilla;
 import Models.Usuario;

@@ -1,6 +1,6 @@
 package Controller;
 
-import DB.DBConfig;
+import Models.DBConfig;
 import Models.ActividadLimpieza;
 import Models.Cuadrilla;
 import java.sql.*;
@@ -70,12 +70,12 @@ public class ActividadLimpiezaDAO {
 
             ActividadLimpieza actividad = buscarActividadPorId(id);
             String mensaje = "Se actualizó la retroalimentación, la imagen y el estatus de la actividad con ID: " + id;
-            
+
             NotificacionObserver observer = new NotificacionObserver(idUsuario);
             actividad.agregarObserver(observer);
-            
+
             actividad.notificarObserver(mensaje);
-            
+
             guardarNotificacion(idUsuario, id, mensaje);
         } catch (SQLException e) {
             System.err.println("Error al actualizar retroalimentación e imagen: " + e.getMessage());
@@ -242,6 +242,7 @@ public class ActividadLimpiezaDAO {
         List<String> notificaciones = new ArrayList<>();
         String sql = "SELECT u.username, o.id_actividad, o.mensaje FROM observadores o "
                 + "JOIN usuarios u ON o.id_usuario = u.id_usuario "
+                + "WHERE o.leido = 0 "
                 + "ORDER BY o.id_observador DESC";
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             try (ResultSet rs = stmt.executeQuery()) {
@@ -256,9 +257,18 @@ public class ActividadLimpiezaDAO {
                 }
             }
         } catch (SQLException e) {
-            System.err.println("Error al obtener notificaciones: " + e.getMessage());
+            System.out.println(e);
         }
         return notificaciones;
+    }
+
+    public void leerNotificaciones() {
+        String sql = "UPDATE observadores SET leido = 1";
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            System.err.println("Error al marcar notificaciones como leídas: " + e.getMessage());
+        }
     }
 
 }
